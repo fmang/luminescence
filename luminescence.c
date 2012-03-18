@@ -5,6 +5,7 @@ int main(int argc, char **argv){
     gtk_init(&argc, &argv);
 
     GtkWidget *win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(win), FALSE);
     g_signal_connect(win, "delete-event", G_CALLBACK(gtk_main_quit), NULL);
 
     GtkWidget *web = webkit_web_view_new();
