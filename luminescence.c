@@ -5,7 +5,13 @@ struct {
     GtkWidget *web_view;
     GtkWidget *address_label;
     GtkWidget *address_entry;
+    GtkWidget *scripts_label;
 } ui;
+
+void enable_scripts(gboolean enable){
+    g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(ui.web_view)), "enable-scripts", enable, NULL);
+    gtk_widget_set_visible(ui.scripts_label, enable);
+}
 
 void show_address_label(){
     gtk_widget_hide(ui.address_entry);
@@ -36,10 +42,12 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
             show_address_label();
             return TRUE;
         }
+        else return FALSE;
     }
-    else if(event->keyval == GDK_KEY_u){
-        show_address_entry();
-        return TRUE;
+    switch(event->keyval){
+        case GDK_KEY_u: show_address_entry();  return TRUE;
+        case GDK_KEY_j: enable_scripts(FALSE); return TRUE;
+        case GDK_KEY_J: enable_scripts(TRUE);  return TRUE;
     }
     return FALSE;
 }
@@ -86,6 +94,9 @@ int main(int argc, char **argv){
     gtk_entry_set_has_frame(GTK_ENTRY(ui.address_entry), FALSE);
     g_signal_connect(ui.address_entry, "activate", G_CALLBACK(go), NULL);
     gtk_box_pack_start(GTK_BOX(status_bar), ui.address_entry, TRUE, TRUE, 0);
+
+    ui.scripts_label = gtk_label_new("JS");
+    gtk_box_pack_start(GTK_BOX(status_bar), ui.scripts_label, FALSE, FALSE, 3);
 
     // Show
 
