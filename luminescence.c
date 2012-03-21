@@ -62,6 +62,8 @@ int main(int argc, char **argv){
 
     ui.web_view = webkit_web_view_new();
     g_signal_connect(ui.web_view, "notify::load-status", G_CALLBACK(update_address_label), NULL);
+    g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(ui.web_view)),
+        "enable-plugins", FALSE, "enable-scripts", FALSE, NULL);
 
     GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(scrolled_window), ui.web_view);
