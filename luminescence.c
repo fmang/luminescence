@@ -8,7 +8,7 @@ struct {
     GtkWidget *scripts_label;
 } ui;
 
-void enable_scripts(gboolean enable){
+void scripts_set_enabled(gboolean enable){
     g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(ui.web_view)), "enable-scripts", enable, NULL);
     gtk_widget_set_visible(ui.scripts_label, enable);
 }
@@ -46,8 +46,8 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     }
     switch(event->keyval){
         case GDK_KEY_u: show_address_entry();  return TRUE;
-        case GDK_KEY_j: enable_scripts(FALSE); return TRUE;
-        case GDK_KEY_J: enable_scripts(TRUE);  return TRUE;
+        case GDK_KEY_s: scripts_set_enabled(FALSE); return TRUE;
+        case GDK_KEY_S: scripts_set_enabled(TRUE);  return TRUE;
         case GDK_KEY_r: webkit_web_view_reload(WEBKIT_WEB_VIEW(ui.web_view)); return TRUE;
         case GDK_KEY_R: webkit_web_view_reload_bypass_cache(WEBKIT_WEB_VIEW(ui.web_view)); return TRUE;
     }
