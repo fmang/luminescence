@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include <gtk/gtk.h>
 #include <webkit/webkit.h>
 
@@ -19,7 +21,14 @@ void show_address_label(){
 }
 
 void go(){
-    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(ui.web_view), gtk_entry_get_text(GTK_ENTRY(ui.address_entry)));
+    const gchar *raw_uri = gtk_entry_get_text(GTK_ENTRY(ui.address_entry));
+    gchar *uri = (gchar*) malloc(strlen(raw_uri)+8);
+    uri[0] = '\0';
+    if(!strstr(raw_uri, "://"))
+        strcat(uri, "http://");
+    strcat(uri, raw_uri);
+    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(ui.web_view), uri);
+    free(uri);
     show_address_label();
 }
 
