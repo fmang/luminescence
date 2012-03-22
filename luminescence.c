@@ -8,6 +8,7 @@ struct {
     GtkWidget *address_label;
     GtkWidget *address_entry;
     GtkWidget *scripts_label;
+    GtkWidget *insert_label;
 } ui;
 
 void scripts_set_enabled(gboolean enable){
@@ -46,21 +47,25 @@ void show_address_entry(){
 }
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
-    if(gtk_widget_get_visible(ui.address_entry)){
+    if(gtk_widget_get_visible(ui.address_entry) || gtk_widget_get_visible(ui.insert_label)){
         if(event->keyval == GDK_KEY_Escape){
             show_address_label();
+            gtk_widget_hide(ui.insert_label);
             return TRUE;
         }
+        // Let Gtk/WebKit handle the key.
         else return FALSE;
     }
     switch(event->keyval){
-        case GDK_KEY_u: show_address_entry();  return TRUE;
-        case GDK_KEY_s: scripts_set_enabled(FALSE); return TRUE;
-        case GDK_KEY_S: scripts_set_enabled(TRUE);  return TRUE;
-        case GDK_KEY_r: webkit_web_view_reload(WEBKIT_WEB_VIEW(ui.web_view)); return TRUE;
-        case GDK_KEY_R: webkit_web_view_reload_bypass_cache(WEBKIT_WEB_VIEW(ui.web_view)); return TRUE;
+        case GDK_KEY_i: gtk_widget_show(ui.insert_label);  break;
+        case GDK_KEY_u: show_address_entry();  break;
+        case GDK_KEY_s: scripts_set_enabled(FALSE); break;
+        case GDK_KEY_S: scripts_set_enabled(TRUE);  break;
+        case GDK_KEY_r: webkit_web_view_reload(WEBKIT_WEB_VIEW(ui.web_view)); break;
+        case GDK_KEY_R: webkit_web_view_reload_bypass_cache(WEBKIT_WEB_VIEW(ui.web_view)); break;
     }
-    return FALSE;
+    // Unknown key, forget about it.
+    return TRUE;
 }
 
 int main(int argc, char **argv){
@@ -108,6 +113,9 @@ int main(int argc, char **argv){
 
     ui.scripts_label = gtk_label_new("JS");
     gtk_box_pack_start(GTK_BOX(status_bar), ui.scripts_label, FALSE, FALSE, 3);
+
+    ui.insert_label = gtk_label_new("INSERT");
+    gtk_box_pack_start(GTK_BOX(status_bar), ui.insert_label, FALSE, FALSE, 3);
 
     // Show
 
