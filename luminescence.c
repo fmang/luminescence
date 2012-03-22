@@ -101,6 +101,7 @@ int main(int argc, char **argv){
     gtk_widget_show(status_bar);
 
     ui.address_label = gtk_label_new("");
+    gtk_label_set_selectable(GTK_LABEL(ui.address_label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(ui.address_label), 0, 0.5);
     gtk_misc_set_padding(GTK_MISC(ui.address_label), 2, 2);
     gtk_box_pack_start(GTK_BOX(status_bar), ui.address_label, TRUE, TRUE, 0);
