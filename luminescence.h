@@ -5,13 +5,13 @@
 #include <webkit/webkit.h>
 
 typedef struct {
-    GtkWidget *window;
-    GtkWidget *status_bar;
-    GtkWidget *web_view;
-    GtkWidget *address_label;
-    GtkWidget *address_entry;
-    GtkWidget *scripts_label;
-    GtkWidget *insert_label;
+    GtkWidget *window;        // GtkWindow
+    GtkWidget *status_bar;    // GtkBox
+    GtkWidget *web_view;      // WebKitWebView
+    GtkWidget *address_label; // GtkLabel
+    GtkWidget *address_entry; // GtkEntry
+    GtkWidget *scripts_label; // GtkLabel
+    GtkWidget *insert_label;  // GtkLabel
 } Lumi;
 
 #endif // LUMINESCENCE_H
