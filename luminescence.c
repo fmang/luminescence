@@ -1,6 +1,7 @@
 #include "luminescence.h"
 #include <stdlib.h>
 #include <string.h>
+#include <dlfcn.h>
 
 Lumi lumi;
 
@@ -59,6 +60,15 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     }
     // Unknown key, forget about it.
     return TRUE;
+}
+
+void load_plugin(const char *path){
+    void *plugin = dlopen(path, RTLD_LAZY);
+    if(!plugin) return;
+    void (*plugin_init)(Lumi*) = dlsym(plugin, "init");
+    if(plugin_init)
+        (*plugin_init)(&lumi);
+    //dlclose(plugin); keep it open in case it sets callbacks
 }
 
 int main(int argc, char **argv){
