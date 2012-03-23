@@ -5,6 +5,7 @@
 #include <webkit/webkit.h>
 
 typedef struct {
+    GtkWidget *window;
     GtkWidget *web_view;
     GtkWidget *address_label;
     GtkWidget *address_entry;

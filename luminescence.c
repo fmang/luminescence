@@ -66,11 +66,11 @@ int main(int argc, char **argv){
 
     // Window
 
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_widget_add_events(window, GDK_KEY_PRESS_MASK);
-    gtk_window_set_has_resize_grip(GTK_WINDOW(window), FALSE);
-    g_signal_connect(window, "delete-event", G_CALLBACK(gtk_main_quit), NULL);
-    g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
+    lumi.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_widget_add_events(lumi.window, GDK_KEY_PRESS_MASK);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(lumi.window), FALSE);
+    g_signal_connect(lumi.window, "delete-event", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(lumi.window, "key-press-event", G_CALLBACK(on_key_press), NULL);
 
     GtkWidget *layout = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_show(layout);
@@ -113,8 +113,8 @@ int main(int argc, char **argv){
 
     // Show
 
-    gtk_container_add(GTK_CONTAINER(window), layout);
-    gtk_widget_show(window);
+    gtk_container_add(GTK_CONTAINER(lumi.window), layout);
+    gtk_widget_show(lumi.window);
     gtk_main();
 
     return 0;
