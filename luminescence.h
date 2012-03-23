@@ -6,6 +6,7 @@
 
 typedef struct {
     GtkWidget *window;
+    GtkWidget *status_bar;
     GtkWidget *web_view;
     GtkWidget *address_label;
     GtkWidget *address_entry;

@@ -89,27 +89,27 @@ int main(int argc, char **argv){
 
     // Status
 
-    GtkWidget *status_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_box_pack_start(GTK_BOX(layout), status_bar, FALSE, FALSE, 0);
-    gtk_widget_show(status_bar);
+    lumi.status_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(layout), lumi.status_bar, FALSE, FALSE, 0);
+    gtk_widget_show(lumi.status_bar);
 
     lumi.address_label = gtk_label_new("");
     gtk_label_set_selectable(GTK_LABEL(lumi.address_label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(lumi.address_label), 0, 0.5);
     gtk_misc_set_padding(GTK_MISC(lumi.address_label), 2, 2);
-    gtk_box_pack_start(GTK_BOX(status_bar), lumi.address_label, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(lumi.status_bar), lumi.address_label, TRUE, TRUE, 0);
     gtk_widget_show(lumi.address_label);
 
     lumi.address_entry = gtk_entry_new();
     gtk_entry_set_has_frame(GTK_ENTRY(lumi.address_entry), FALSE);
     g_signal_connect(lumi.address_entry, "activate", G_CALLBACK(go), NULL);
-    gtk_box_pack_start(GTK_BOX(status_bar), lumi.address_entry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(lumi.status_bar), lumi.address_entry, TRUE, TRUE, 0);
 
     lumi.scripts_label = gtk_label_new("JS");
-    gtk_box_pack_start(GTK_BOX(status_bar), lumi.scripts_label, FALSE, FALSE, 3);
+    gtk_box_pack_start(GTK_BOX(lumi.status_bar), lumi.scripts_label, FALSE, FALSE, 3);
 
     lumi.insert_label = gtk_label_new("INSERT");
-    gtk_box_pack_start(GTK_BOX(status_bar), lumi.insert_label, FALSE, FALSE, 3);
+    gtk_box_pack_start(GTK_BOX(lumi.status_bar), lumi.insert_label, FALSE, FALSE, 3);
 
     // Show
 
