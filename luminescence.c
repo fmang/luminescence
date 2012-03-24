@@ -14,7 +14,7 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     for(; i<key_callback_count; i++){
         code = (*(key_grabber ? key_grabber : key_callbacks[i]))(event);
         if(code & FOCUS_GRAB){
-            key_grabber = key_callbacks[i];
+            if(!key_grabber) key_grabber = key_callbacks[i];
             return code & EVENT_STOP ? TRUE : FALSE;
         }
         else if(key_grabber){
