@@ -5,9 +5,8 @@
 
 Lumi lumi;
 
-#define MAX_CALLBACK_COUNT 32
-
-KeyCallback key_callbacks[MAX_CALLBACK_COUNT];
+KeyCallback *key_callbacks;
+int key_callbacks_size = 0;
 int key_callback_count = 0;
 
 void scripts_set_enabled(gboolean enable){
@@ -71,7 +70,10 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
 }
 
 void load_plugin(const char *path){
-    if(key_callback_count >= MAX_CALLBACK_COUNT) return; // too many loaded plugins
+    if(key_callback_count >= key_callbacks_size){
+        key_callbacks_size += 8;
+        key_callbacks = (KeyCallback*) realloc(key_callbacks, key_callbacks_size*sizeof(KeyCallback));
+    }
     void *plugin = dlopen(path, RTLD_LAZY);
     if(!plugin) return;
     void (*plugin_init)(Lumi*) = dlsym(plugin, "init");
