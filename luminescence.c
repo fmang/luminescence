@@ -45,9 +45,12 @@ void show_address_entry(){
 }
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
-    int i = 0;
-    for(; i<key_callback_count; i++)
-        (*key_callbacks[i])(event);
+    int i = 0, code;
+    for(; i<key_callback_count; i++){
+        code = (*key_callbacks[i])(event);
+        if(code & EVENT_STOP)
+            return TRUE;
+    }
     if(gtk_widget_get_visible(lumi.address_entry) || gtk_widget_get_visible(lumi.insert_label)){
         if(event->keyval == GDK_KEY_Escape){
             show_address_label();

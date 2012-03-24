@@ -14,6 +14,10 @@ typedef struct {
     GtkWidget *insert_label;  // GtkLabel
 } Lumi;
 
-typedef void KeyCallback(GdkEventKey*);
+#define EVENT_PROPAGATE 0
+#define EVENT_STOP      1
+
+// Returns either of the above constants.
+typedef int KeyCallback(GdkEventKey*);
 
 #endif // LUMINESCENCE_H
