@@ -1,0 +1,6 @@
+Installation:
+$ make install
+
+By default, no plugins are compiled, but their source files are stored in /usr/[local/]/src/luminescence/plugins.
+
+The luminescence-install script takes C plugin files, compile them, and put the compiled plugins in ~/.luminescence/plugins.
