@@ -1,5 +1,6 @@
 #!/bin/bash
 mkdir -p ~/.luminescence/plugins
 for f in "$@" ; do
-    gcc -g -Wall -shared -o "$HOME/.luminescence/plugins/$(basename "$f" .c).so" "$f" -fPIC `pkg-config --cflags --libs gtk+-3.0 webkitgtk-3.0`
+    echo "installing $(basename "$f" .c)..."
+    gcc -g -Wall -shared -o "$HOME/.luminescence/plugins/$(basename "$f" .c).so" "$f" -fPIC `pkg-config --cflags --libs gtk+-3.0 webkitgtk-3.0` $FLAGS
 done

@@ -1,4 +1,4 @@
-#include "../luminescence.h"
+#include <luminescence.h>
 
 GtkWidget *insert_label;
 

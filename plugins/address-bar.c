@@ -1,4 +1,4 @@
-#include "../luminescence.h"
+#include <luminescence.h>
 #include <stdlib.h>
 #include <string.h>
 
