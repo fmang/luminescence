@@ -24,11 +24,6 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
         if(code & EVENT_STOP)
             return TRUE;
     }
-    switch(event->keyval){
-        case GDK_KEY_r: webkit_web_view_reload(WEBKIT_WEB_VIEW(lumi.web_view)); break;
-        case GDK_KEY_R: webkit_web_view_reload_bypass_cache(WEBKIT_WEB_VIEW(lumi.web_view)); break;
-    }
-    // Unknown key, forget about it.
     return TRUE;
 }
 
@@ -76,6 +71,7 @@ int main(int argc, char **argv){
     gtk_box_pack_start(GTK_BOX(layout), lumi.status_bar, FALSE, FALSE, 0);
     gtk_widget_show(lumi.status_bar);
 
+    load_plugin("plugins/reload.so");
     load_plugin("plugins/address-bar.so");
     load_plugin("plugins/scripts-toggler.so");
     load_plugin("plugins/insert.so");
