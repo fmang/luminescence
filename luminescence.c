@@ -5,7 +5,7 @@
 
 Lumi lumi;
 
-KeyCallback *key_callbacks;
+KeyCallback **key_callbacks;
 int key_callbacks_size = 0;
 int key_callback_count = 0;
 
@@ -72,14 +72,14 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
 void load_plugin(const char *path){
     if(key_callback_count >= key_callbacks_size){
         key_callbacks_size += 8;
-        key_callbacks = (KeyCallback*) realloc(key_callbacks, key_callbacks_size*sizeof(KeyCallback));
+        key_callbacks = (KeyCallback**) realloc(key_callbacks, key_callbacks_size*sizeof(KeyCallback*));
     }
     void *plugin = dlopen(path, RTLD_LAZY);
     if(!plugin) return;
     void (*plugin_init)(Lumi*) = dlsym(plugin, "init");
     if(plugin_init)
         (*plugin_init)(&lumi);
-    KeyCallback plugin_key_callback = dlsym(plugin, "key_callback");
+    KeyCallback* plugin_key_callback = dlsym(plugin, "key_callback");
     if(plugin_key_callback)
         key_callbacks[key_callback_count++] = plugin_key_callback;
 }
