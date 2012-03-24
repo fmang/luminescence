@@ -1,6 +1,10 @@
+Build:
+$ make
+
 Installation:
-$ make install
+# make install
+(the default DESTDIR is /usr/local)
 
 By default, no plugins are compiled, but their source files are stored in /usr/[local/]src/luminescence/plugins.
 
-The luminescence-install script takes C plugin files, compile them, and put the compiled plugins in ~/.luminescence/plugins.
+The luminescence-install script takes C plugin files, compiles them, and puts the compiled plugins in ~/.luminescence/plugins.
