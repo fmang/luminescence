@@ -71,6 +71,11 @@ void load_plugins(){
 int main(int argc, char **argv){
     gtk_init(&argc, &argv);
 
+    char *lumi_dir = strdup(getenv("HOME"));
+    lumi_dir = realloc(lumi_dir, strlen(lumi_dir) + 15);
+    strcat(lumi_dir, "/.luminescence");
+    chdir(lumi_dir);
+
     // Window
     lumi.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_widget_add_events(lumi.window, GDK_KEY_PRESS_MASK);
