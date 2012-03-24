@@ -6,6 +6,7 @@
 Lumi lumi;
 
 KeyCallback **key_callbacks;
+KeyCallback *key_grabber = 0;
 int key_callbacks_size = 0;
 int key_callback_count = 0;
 
@@ -47,7 +48,15 @@ void show_address_entry(){
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     int i = 0, code;
     for(; i<key_callback_count; i++){
-        code = (*key_callbacks[i])(event);
+        code = (*(key_grabber ? key_grabber : key_callbacks[i]))(event);
+        if(code & FOCUS_GRAB){
+            key_grabber = key_callbacks[i];
+            return code & EVENT_STOP ? TRUE : FALSE;
+        }
+        else if(key_grabber){
+            key_grabber = 0;
+            i--;
+        }
         if(code & EVENT_STOP)
             return TRUE;
     }

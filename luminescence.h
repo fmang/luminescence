@@ -17,7 +17,10 @@ typedef struct {
 #define EVENT_PROPAGATE 0
 #define EVENT_STOP      1
 
-// Returns either of the above constants.
+#define FOCUS_RELEASE   0
+#define FOCUS_GRAB      2
+
+// Returns an OR'd combination of the above flags.
 typedef int KeyCallback(GdkEventKey*);
 
 #endif // LUMINESCENCE_H
