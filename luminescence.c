@@ -1,5 +1,7 @@
 #include "luminescence.h"
 #include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
 #include <dlfcn.h>
 
 Lumi lumi;
@@ -47,6 +49,25 @@ void load_plugin(const char *path){
     }
 }
 
+int is_visible(const struct dirent *entry){
+    return entry->d_name[0] != '.';
+}
+
+void load_plugins(){
+    struct dirent **entries;
+    int entry_count = scandir("plugins", &entries, is_visible, alphasort);
+    if(entry_count < 0) return;
+    char filename[256];
+    int i = 0;
+    for(; i<entry_count; i++){
+        strcpy(filename, "plugins/");
+        strncat(filename, entries[i]->d_name, 247);
+        load_plugin(filename);
+        free(entries[i]);
+    }
+    free(entries);
+}
+
 int main(int argc, char **argv){
     gtk_init(&argc, &argv);
 
@@ -74,11 +95,7 @@ int main(int argc, char **argv){
     gtk_box_pack_start(GTK_BOX(layout), lumi.status_bar, FALSE, FALSE, 0);
     gtk_widget_show(lumi.status_bar);
 
-    // Plugins
-    load_plugin("plugins/reload.so");
-    load_plugin("plugins/address-bar.so");
-    load_plugin("plugins/scripts-toggler.so");
-    load_plugin("plugins/insert.so");
+    load_plugins();
 
     gtk_widget_show(lumi.window);
     gtk_main();
