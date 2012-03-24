@@ -60,17 +60,15 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
         if(code & EVENT_STOP)
             return TRUE;
     }
-    if(gtk_widget_get_visible(lumi.address_entry) || gtk_widget_get_visible(lumi.insert_label)){
+    if(gtk_widget_get_visible(lumi.address_entry)){
         if(event->keyval == GDK_KEY_Escape){
             show_address_label();
-            gtk_widget_hide(lumi.insert_label);
             return TRUE;
         }
         // Let Gtk/WebKit handle the key.
         else return FALSE;
     }
     switch(event->keyval){
-        case GDK_KEY_i: gtk_widget_show(lumi.insert_label);  break;
         case GDK_KEY_u: show_address_entry();  break;
         case GDK_KEY_s: scripts_set_enabled(FALSE); break;
         case GDK_KEY_S: scripts_set_enabled(TRUE);  break;
@@ -143,8 +141,7 @@ int main(int argc, char **argv){
     lumi.scripts_label = gtk_label_new("JS");
     gtk_box_pack_start(GTK_BOX(lumi.status_bar), lumi.scripts_label, FALSE, FALSE, 3);
 
-    lumi.insert_label = gtk_label_new("INSERT");
-    gtk_box_pack_start(GTK_BOX(lumi.status_bar), lumi.insert_label, FALSE, FALSE, 3);
+    load_plugin("plugins/insert.so");
 
     // Show
 

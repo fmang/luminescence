@@ -11,7 +11,6 @@ typedef struct {
     GtkWidget *address_label; // GtkLabel
     GtkWidget *address_entry; // GtkEntry
     GtkWidget *scripts_label; // GtkLabel
-    GtkWidget *insert_label;  // GtkLabel
 } Lumi;
 
 #define EVENT_PROPAGATE 0
