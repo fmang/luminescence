@@ -9,11 +9,6 @@ KeyCallback *key_grabber = 0;
 int key_callbacks_size = 0;
 int key_callback_count = 0;
 
-void scripts_set_enabled(gboolean enable){
-    g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(lumi.web_view)), "enable-scripts", enable, NULL);
-    gtk_widget_set_visible(lumi.scripts_label, enable);
-}
-
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     int i = 0, code;
     for(; i<key_callback_count; i++){
@@ -30,8 +25,6 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
             return TRUE;
     }
     switch(event->keyval){
-        case GDK_KEY_s: scripts_set_enabled(FALSE); break;
-        case GDK_KEY_S: scripts_set_enabled(TRUE);  break;
         case GDK_KEY_r: webkit_web_view_reload(WEBKIT_WEB_VIEW(lumi.web_view)); break;
         case GDK_KEY_R: webkit_web_view_reload_bypass_cache(WEBKIT_WEB_VIEW(lumi.web_view)); break;
     }
@@ -71,8 +64,6 @@ int main(int argc, char **argv){
     // Web view
 
     lumi.web_view = webkit_web_view_new();
-    g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(lumi.web_view)),
-        "enable-plugins", FALSE, "enable-scripts", FALSE, NULL);
 
     GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(scrolled_window), lumi.web_view);
@@ -86,10 +77,7 @@ int main(int argc, char **argv){
     gtk_widget_show(lumi.status_bar);
 
     load_plugin("plugins/address-bar.so");
-
-    lumi.scripts_label = gtk_label_new("JS");
-    gtk_box_pack_start(GTK_BOX(lumi.status_bar), lumi.scripts_label, FALSE, FALSE, 3);
-
+    load_plugin("plugins/scripts-toggler.so");
     load_plugin("plugins/insert.so");
 
     // Show

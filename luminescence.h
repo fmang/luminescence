@@ -5,10 +5,9 @@
 #include <webkit/webkit.h>
 
 typedef struct {
-    GtkWidget *window;        // GtkWindow
-    GtkWidget *status_bar;    // GtkBox
-    GtkWidget *web_view;      // WebKitWebView
-    GtkWidget *scripts_label; // GtkLabel
+    GtkWidget *window;     // GtkWindow
+    GtkWidget *status_bar; // GtkBox
+    GtkWidget *web_view;   // WebKitWebView
 } Lumi;
 
 #define EVENT_PROPAGATE 0
