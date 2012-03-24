@@ -5,6 +5,11 @@
 
 Lumi lumi;
 
+#define MAX_CALLBACK_COUNT 32
+
+KeyCallback key_callbacks[MAX_CALLBACK_COUNT];
+int key_callback_count = 0;
+
 void scripts_set_enabled(gboolean enable){
     g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(lumi.web_view)), "enable-scripts", enable, NULL);
     gtk_widget_set_visible(lumi.scripts_label, enable);
@@ -41,6 +46,9 @@ void show_address_entry(){
 }
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
+    int i = 0;
+    for(; i<key_callback_count; i++)
+        (*key_callbacks[i])(event);
     if(gtk_widget_get_visible(lumi.address_entry) || gtk_widget_get_visible(lumi.insert_label)){
         if(event->keyval == GDK_KEY_Escape){
             show_address_label();
@@ -63,12 +71,15 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
 }
 
 void load_plugin(const char *path){
+    if(key_callback_count >= MAX_CALLBACK_COUNT) return; // too many loaded plugins
     void *plugin = dlopen(path, RTLD_LAZY);
     if(!plugin) return;
     void (*plugin_init)(Lumi*) = dlsym(plugin, "init");
     if(plugin_init)
         (*plugin_init)(&lumi);
-    //dlclose(plugin); keep it open in case it sets callbacks
+    KeyCallback plugin_key_callback = dlsym(plugin, "key_callback");
+    if(plugin_key_callback)
+        key_callbacks[key_callback_count++] = plugin_key_callback;
 }
 
 int main(int argc, char **argv){

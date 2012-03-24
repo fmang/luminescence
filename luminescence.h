@@ -14,4 +14,6 @@ typedef struct {
     GtkWidget *insert_label;  // GtkLabel
 } Lumi;
 
+typedef void (*KeyCallback)(GdkEventKey*);
+
 #endif // LUMINESCENCE_H
