@@ -11,6 +11,6 @@ clean:
 
 install: luminescence
 	mkdir -p $(DESTDIR)/{bin,include,src/luminescence/plugins}
-	install -m 755 luminescence lumi-install -t $(DESTDIR)/bin
+	install -m 755 luminescence luminescence-install -t $(DESTDIR)/bin
 	install -m 644 luminescence.h -t $(DESTDIR)/include
 	install -m 644 plugins/*.c -t $(DESTDIR)/src/luminescence/plugins
