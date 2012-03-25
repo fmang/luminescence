@@ -141,7 +141,7 @@ int main(int argc, char **argv){
     // Help
     if(argc == 2){
         if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-            puts("Usage: luminescence --OPTION[=VALUE] ...");
+            puts("Usage: luminescence --OPTION[=VALUE] ...\n");
             if(!plugin_count){
                 puts("No plugins.");
                 return 0;
@@ -161,12 +161,12 @@ int main(int argc, char **argv){
                 else
                     puts(plugins[i].filename);
                 if(plugins[i].description)
-                    puts(plugins[i].description);
+                    printf("  %s\n", plugins[i].description);
                 o = plugins[i].options;
                 if(!o) continue;
-                puts("Options:");
+                puts("  Options:");
                 for(; o->name; o++){
-                    fputs("  ", stdout);
+                    fputs("    ", stdout);
                     fputs(o->name, stdout);
                     if(o->description){
                         pad = longest - strlen(o->name) + 3;
