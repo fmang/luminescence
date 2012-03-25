@@ -130,6 +130,45 @@ void load_config(){
     fclose(f);
 }
 
+void print_help(){
+    puts("Usage: luminescence --OPTION[=VALUE] ...\n");
+    if(!plugin_count){
+        puts("No plugins.");
+        return;
+    }
+    puts("Available plugins:");
+    int i, j, pad;
+    Option *o;
+    int longest = 0;
+    for(i=0; i<option_count; i++){
+        if(strlen(options[i]->name) > longest)
+            longest = strlen(options[i]->name);
+    }
+    for(i=0; i<plugin_count; i++){
+        fputs("* ", stdout);
+        if(plugins[i].name)
+            printf("%s (%s)\n", plugins[i].name, plugins[i].filename);
+        else
+            puts(plugins[i].filename);
+        if(plugins[i].description)
+            printf("  %s\n", plugins[i].description);
+        o = plugins[i].options;
+        if(!o) continue;
+        puts("  Options:");
+        for(; o->name; o++){
+            fputs("    ", stdout);
+            fputs(o->name, stdout);
+            if(o->description){
+                pad = longest - strlen(o->name) + 3;
+                for(j=0; j<pad; j++)
+                    putchar(' ');
+                fputs(o->description, stdout);
+            }
+            putchar('\n');
+        }
+    }
+}
+
 int main(int argc, char **argv){
     char *lumi_dir = strdup(getenv("HOME"));
     lumi_dir = realloc(lumi_dir, strlen(lumi_dir) + 15);
@@ -141,42 +180,7 @@ int main(int argc, char **argv){
     // Help
     if(argc == 2){
         if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-            puts("Usage: luminescence --OPTION[=VALUE] ...\n");
-            if(!plugin_count){
-                puts("No plugins.");
-                return 0;
-            }
-            puts("Available plugins:");
-            int i, j, pad;
-            Option *o;
-            int longest = 0;
-            for(i=0; i<option_count; i++){
-                if(strlen(options[i]->name) > longest)
-                    longest = strlen(options[i]->name);
-            }
-            for(i=0; i<plugin_count; i++){
-                fputs("* ", stdout);
-                if(plugins[i].name)
-                    printf("%s (%s)\n", plugins[i].name, plugins[i].filename);
-                else
-                    puts(plugins[i].filename);
-                if(plugins[i].description)
-                    printf("  %s\n", plugins[i].description);
-                o = plugins[i].options;
-                if(!o) continue;
-                puts("  Options:");
-                for(; o->name; o++){
-                    fputs("    ", stdout);
-                    fputs(o->name, stdout);
-                    if(o->description){
-                        pad = longest - strlen(o->name) + 3;
-                        for(j=0; j<pad; j++)
-                            putchar(' ');
-                        fputs(o->description, stdout);
-                    }
-                    putchar('\n');
-                }
-            }
+            print_help();
             return 0;
         }
     }
