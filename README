@@ -1,10 +1,19 @@
-Build:
-$ make
+INSTALLING
 
-Installation:
-# make install
-(the default DESTDIR is /usr/local)
+  For Arch Linux users:
+  AUR: https://aur.archlinux.org/packages.php?ID=57930
 
-By default, no plugins are compiled, but their source files are stored in /usr/[local/]src/luminescence/plugins.
+  From Source:
+    make
+    make install
+  (the default DESTDIR is /usr/local)
 
-The luminescence-install script takes C plugin files, compiles them, and puts the compiled plugins in ~/.luminescence/plugins.
+PLUGINS
+
+  Plugins are read in alphabetical order (it does matter) from ~/.luminescence/plugins.
+
+  By default, no plugins are compiled, but their source files are stored in /usr/[local/]src/luminescence/plugins.
+
+  The luminescence-install script takes C plugin files and installs them.
+  For example, to install all the available plugins:
+    luminescence-install /usr/src/luminescence/plugins/*.c
