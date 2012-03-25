@@ -19,8 +19,8 @@ Option options[] = {
 
 int key_callback(GdkEventKey *e){
     switch(e->keyval){
-        case GDK_KEY_s: enable_scripts();  return EVENT_STOP;
-        case GDK_KEY_S: disable_scripts(); return EVENT_STOP;
+        case GDK_KEY_s: disable_scripts(); return EVENT_STOP;
+        case GDK_KEY_S: enable_scripts();  return EVENT_STOP;
     }
     return EVENT_PROPAGATE;
 }
