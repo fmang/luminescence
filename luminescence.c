@@ -165,7 +165,7 @@ int main(int argc, char **argv){
 
     // Options
     load_config();
-    struct option *opts = (struct option*) malloc(sizeof(struct option*) * (option_count+1));
+    struct option *opts = (struct option*) malloc(sizeof(struct option) * (option_count+1));
     opts[option_count].name = 0;
     int arg;
     for(i=0; i<option_count; i++){
