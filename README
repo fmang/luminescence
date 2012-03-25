@@ -12,8 +12,22 @@ PLUGINS
 
   Plugins are read in alphabetical order (it does matter) from ~/.luminescence/plugins.
 
-  By default, no plugins are compiled, but their source files are stored in /usr/[local/]src/luminescence/plugins.
+  By default, no plugins are compiled.
+  Instead, their source files are stored in /usr/[local/]src/luminescence/plugins.
 
   The luminescence-install script takes C plugin files and installs them.
   For example, to install all the available plugins:
     luminescence-install /usr/src/luminescence/plugins/*.c
+
+OPTIONS
+
+  You can list the available options with:
+    luminescence --help
+
+  The configuration is stored in ~/.luminescence/config:
+    # Sample configuration file
+    no-scripts
+    user-agent Luminescence
+
+  Alternatively, you can set the options from the command-line (luminescence uses getopt):
+    luminescence --no-scripts --user-agent Luminescence
