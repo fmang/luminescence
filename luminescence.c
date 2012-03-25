@@ -6,9 +6,8 @@
 
 Lumi lumi;
 
-KeyCallback **key_callbacks;
+KeyCallback **key_callbacks = 0;
 KeyCallback *key_grabber = 0;
-int key_callbacks_size = 0;
 int key_callback_count = 0;
 
 Option *options = 0;
@@ -43,11 +42,7 @@ void load_plugin(const char *path){
     // Key callback
     KeyCallback* plugin_key_callback = dlsym(plugin, "key_callback");
     if(plugin_key_callback){
-        if(key_callback_count >= key_callbacks_size){
-            // Grow key_callbacks
-            key_callbacks_size += 8;
-            key_callbacks = (KeyCallback**) realloc(key_callbacks, key_callbacks_size*sizeof(KeyCallback*));
-        }
+        key_callbacks = (KeyCallback**) realloc(key_callbacks, sizeof(KeyCallback*) * (key_callback_count+1));
         key_callbacks[key_callback_count++] = plugin_key_callback;
     }
 
