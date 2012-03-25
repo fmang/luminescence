@@ -123,12 +123,35 @@ void load_config(){
 }
 
 int main(int argc, char **argv){
-    gtk_init(&argc, &argv);
-
     char *lumi_dir = strdup(getenv("HOME"));
     lumi_dir = realloc(lumi_dir, strlen(lumi_dir) + 15);
     strcat(lumi_dir, "/.luminescence");
     chdir(lumi_dir);
+
+    load_plugins();
+
+    // Help
+    if(argc == 2){
+        if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
+            puts("Usage: luminescence --OPTION[=VALUE] ...");
+            if(option_count){
+                puts("Available options:");
+                int i = 0;
+                for(; i<option_count; i++){
+                    fputs("  ", stdout);
+                    fputs(options[i].name, stdout);
+                    if(options[i].description){
+                        fputs(": ", stdout);
+                        fputs(options[i].description, stdout);
+                    }
+                    fputs("\n", stdout);
+                }
+            }
+            return 0;
+        }
+    }
+
+    gtk_init(&argc, &argv);
 
     // Window
     lumi.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -155,7 +178,6 @@ int main(int argc, char **argv){
     gtk_widget_show(lumi.status_bar);
 
     // Plugins
-    load_plugins();
     int i;
     void (*plugin_init)(Lumi*);
     for(i=0; i<plugin_count; i++){

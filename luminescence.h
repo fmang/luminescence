@@ -31,6 +31,7 @@ typedef struct {
     const char *name;
     int argument;
     void (*callback)(const char*);
+    const char *description;
 } Option;
 
 #endif // LUMINESCENCE_H
