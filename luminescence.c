@@ -80,6 +80,48 @@ void load_plugins(){
     free(entries);
 }
 
+void set_option(const char *opt, const char *val){
+    int i = 0;
+    for(; i<option_count; i++){
+        if(strcmp(options[i].name, opt) == 0)
+            break;
+    }
+    if(i == option_count)
+        fprintf(stderr, "unknown option %s\n", opt);
+    else if(options[i].argument == REQUIRED_ARGUMENT && !val)
+        fprintf(stderr, "missing argument for option %s\n", opt);
+    else{
+        if(options[i].argument == NO_ARGUMENT && val)
+            fprintf(stderr, "warning: option %s takes no argument\n", opt);
+        options[i].callback(val);
+    }
+}
+
+void load_config(){
+    FILE *f = fopen("config", "r");
+    if(!f) return;
+    char *line = 0;
+    size_t n = 0;
+    char *name=0, *space;
+    while(getline(&line, &n, f) != -1){
+        if(line[0] == '\0') break; // empty
+        if(line[0] == '\n' || line[0] == '#') continue; // comment
+        if(line[strlen(line)-1] == '\n')
+            line[strlen(line)-1] = '\0'; // drop the newline
+        space = strchr(line, ' ');
+        if(!space)
+            set_option(line, 0);
+        else{
+            name = (char*) realloc(name, space-line+1);
+            strncpy(name, line, space-line);
+            set_option(name, space+1);
+        }
+    }
+    free(line);
+    if(name) free(name);
+    fclose(f);
+}
+
 int main(int argc, char **argv){
     gtk_init(&argc, &argv);
 
@@ -122,6 +164,7 @@ int main(int argc, char **argv){
     }
 
     // Options
+    load_config();
     struct option *opts = (struct option*) malloc(sizeof(struct option*) * (option_count+1));
     opts[option_count].name = 0;
     int arg;
