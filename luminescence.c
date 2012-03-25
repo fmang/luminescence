@@ -6,6 +6,9 @@
 
 Lumi lumi;
 
+void **plugins = 0;
+int plugin_count = 0;
+
 KeyCallback **key_callbacks = 0;
 KeyCallback *key_grabber = 0;
 int key_callback_count = 0;
@@ -35,9 +38,8 @@ void load_plugin(const char *path){
     void *plugin = dlopen(path, RTLD_LAZY);
     if(!plugin) return;
 
-    // Init
-    void (*plugin_init)(Lumi*) = dlsym(plugin, "init");
-    if(plugin_init) (*plugin_init)(&lumi);
+    plugins = (void**) realloc(plugins, sizeof(void*) * (plugin_count+1));
+    plugins[plugin_count++] = plugin;
 
     // Key callback
     KeyCallback* plugin_key_callback = dlsym(plugin, "key_callback");
@@ -109,9 +111,22 @@ int main(int argc, char **argv){
     gtk_box_pack_start(GTK_BOX(layout), lumi.status_bar, FALSE, FALSE, 0);
     gtk_widget_show(lumi.status_bar);
 
+    // Plugins
     load_plugins();
+    unsigned i;
+    void (*plugin_init)(Lumi*);
+    for(i=0; i<plugin_count; i++){
+        plugin_init = dlsym(plugins[i], "init");
+        if(plugin_init) (*plugin_init)(&lumi);
+    }
 
+    // Exec
     gtk_widget_show(lumi.window);
     gtk_main();
+
+    // Clean up
+    for(i=0; i<plugin_count; i++)
+        dlclose(plugins[i]);
+
     return 0;
 }
