@@ -11,6 +11,9 @@ KeyCallback *key_grabber = 0;
 int key_callbacks_size = 0;
 int key_callback_count = 0;
 
+Option *options = 0;
+int options_count = 0;
+
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     int i = 0, code;
     for(; i<key_callback_count; i++){
@@ -46,6 +49,17 @@ void load_plugin(const char *path){
             key_callbacks = (KeyCallback**) realloc(key_callbacks, key_callbacks_size*sizeof(KeyCallback*));
         }
         key_callbacks[key_callback_count++] = plugin_key_callback;
+    }
+
+    // Options
+    Option *plugin_options = dlsym(plugin, "options");
+    if(plugin_options){
+        size_t plugin_options_count = 0;
+        while((plugin_options)[plugin_options_count].name)
+            plugin_options_count++;
+        options = (Option*) realloc(options, sizeof(Option) * (options_count + plugin_options_count));
+        memcpy(options + options_count, plugin_options, sizeof(Option) * plugin_options_count);
+        options_count += plugin_options_count;
     }
 }
 
