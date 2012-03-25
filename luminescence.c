@@ -3,6 +3,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <dlfcn.h>
+#include <getopt.h>
 
 Lumi lumi;
 
@@ -14,7 +15,7 @@ KeyCallback *key_grabber = 0;
 int key_callback_count = 0;
 
 Option *options = 0;
-int options_count = 0;
+int option_count = 0;
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     int i = 0, code;
@@ -51,12 +52,12 @@ void load_plugin(const char *path){
     // Options
     Option *plugin_options = dlsym(plugin, "options");
     if(plugin_options){
-        size_t plugin_options_count = 0;
-        while((plugin_options)[plugin_options_count].name)
-            plugin_options_count++;
-        options = (Option*) realloc(options, sizeof(Option) * (options_count + plugin_options_count));
-        memcpy(options + options_count, plugin_options, sizeof(Option) * plugin_options_count);
-        options_count += plugin_options_count;
+        size_t plugin_option_count = 0;
+        while((plugin_options)[plugin_option_count].name)
+            plugin_option_count++;
+        options = (Option*) realloc(options, sizeof(Option) * (option_count + plugin_option_count));
+        memcpy(options + option_count, plugin_options, sizeof(Option) * plugin_option_count);
+        option_count += plugin_option_count;
     }
 }
 
@@ -113,12 +114,29 @@ int main(int argc, char **argv){
 
     // Plugins
     load_plugins();
-    unsigned i;
+    int i;
     void (*plugin_init)(Lumi*);
     for(i=0; i<plugin_count; i++){
         plugin_init = dlsym(plugins[i], "init");
         if(plugin_init) (*plugin_init)(&lumi);
     }
+
+    // Options
+    struct option *opts = (struct option*) malloc(sizeof(struct option*) * (option_count+1));
+    opts[option_count].name = 0;
+    int arg;
+    for(i=0; i<option_count; i++){
+        arg = options[i].argument;
+        opts[i].name = options[i].name;
+        opts[i].has_arg = arg == OPTIONAL_ARGUMENT ? optional_argument :
+                          arg == REQUIRED_ARGUMENT ? required_argument : no_argument;
+        opts[i].flag = 0;
+    }
+    while(i=-1, getopt_long(argc, argv, "", opts, &i) != -1){
+        if(i != -1)
+            options[i].callback(optarg);
+    }
+    free(opts);
 
     // Exec
     gtk_widget_show(lumi.window);

@@ -30,6 +30,7 @@ typedef int KeyCallback(GdkEventKey*);
 typedef struct {
     const char *name;
     int argument;
+    void (*callback)(const char*);
 } Option;
 
 #endif // LUMINESCENCE_H
