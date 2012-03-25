@@ -9,6 +9,7 @@ Lumi lumi;
 
 typedef struct {
     void *handle;
+    void (*init)(Lumi*);
     KeyCallback *key_callback;
     Option *options;
 } Plugin;
@@ -46,8 +47,7 @@ void load_plugin(const char *path){
     plugins = (Plugin*) realloc(plugins, sizeof(Plugin) * (plugin_count+1));
     Plugin *plugin = plugins + plugin_count++;
     plugin->handle = handle;
-
-    // Key callback
+    plugin->init = dlsym(handle, "init");
     plugin->key_callback = dlsym(handle, "key_callback");
 
     // Options
@@ -186,11 +186,8 @@ int main(int argc, char **argv){
 
     // Plugins
     int i;
-    void (*plugin_init)(Lumi*);
-    for(i=0; i<plugin_count; i++){
-        plugin_init = dlsym(plugins[i].handle, "init");
-        if(plugin_init) (*plugin_init)(&lumi);
-    }
+    for(i=0; i<plugin_count; i++)
+        if(plugins[i].init) (*plugins[i].init)(&lumi);
 
     // Options
     load_config();
@@ -213,10 +210,6 @@ int main(int argc, char **argv){
     // Exec
     gtk_widget_show(lumi.window);
     gtk_main();
-
-    // Clean up
-    for(i=0; i<plugin_count; i++)
-        dlclose(plugins[i].handle);
 
     return 0;
 }
