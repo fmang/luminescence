@@ -9,6 +9,9 @@ Lumi lumi;
 
 typedef struct {
     void *handle;
+    char *filename;
+    const char *name;
+    const char *description;
     void (*init)(Lumi*);
     KeyCallback *key_callback;
     Option *options;
@@ -40,13 +43,21 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     return TRUE;
 }
 
-void load_plugin(const char *path){
+void load_plugin(const char *filename){
+    char path[256];
+    strcpy(path, "plugins/");
+    strncat(path, filename, 247);
     void *handle = dlopen(path, RTLD_LAZY);
     if(!handle) return;
 
     plugins = (Plugin*) realloc(plugins, sizeof(Plugin) * (plugin_count+1));
     Plugin *plugin = plugins + plugin_count++;
     plugin->handle = handle;
+    plugin->filename = strdup(filename);
+    const char **name = dlsym(handle, "name");
+    plugin->name = name ? *name : 0;
+    const char **description = dlsym(handle, "description");
+    plugin->description = description ? *description : 0;
     plugin->init = dlsym(handle, "init");
     plugin->key_callback = dlsym(handle, "key_callback");
 
@@ -69,12 +80,9 @@ void load_plugins(){
     struct dirent **entries;
     int entry_count = scandir("plugins", &entries, is_visible, alphasort);
     if(entry_count < 0) return;
-    char filename[256];
     int i = 0;
     for(; i<entry_count; i++){
-        strcpy(filename, "plugins/");
-        strncat(filename, entries[i]->d_name, 247);
-        load_plugin(filename);
+        load_plugin(entries[i]->d_name);
         free(entries[i]);
     }
     free(entries);
@@ -134,22 +142,37 @@ int main(int argc, char **argv){
     if(argc == 2){
         if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
             puts("Usage: luminescence --OPTION[=VALUE] ...");
-            if(option_count){
-                puts("Available options:");
-                int i, j, pad;
-                int longest = 0;
-                for(i=0; i<option_count; i++){
-                    if(strlen(options[i]->name) > longest)
-                        longest = strlen(options[i]->name);
-                }
-                for(i=0; i<option_count; i++){
+            if(!plugin_count){
+                puts("No plugins.");
+                return 0;
+            }
+            puts("Available plugins:");
+            int i, j, pad;
+            Option *o;
+            int longest = 0;
+            for(i=0; i<option_count; i++){
+                if(strlen(options[i]->name) > longest)
+                    longest = strlen(options[i]->name);
+            }
+            for(i=0; i<plugin_count; i++){
+                fputs("* ", stdout);
+                if(plugins[i].name)
+                    printf("%s (%s)\n", plugins[i].name, plugins[i].filename);
+                else
+                    puts(plugins[i].filename);
+                if(plugins[i].description)
+                    puts(plugins[i].description);
+                o = plugins[i].options;
+                if(!o) continue;
+                puts("Options:");
+                for(; o->name; o++){
                     fputs("  ", stdout);
-                    fputs(options[i]->name, stdout);
-                    if(options[i]->description){
-                        pad = longest - strlen(options[i]->name) + 3;
+                    fputs(o->name, stdout);
+                    if(o->description){
+                        pad = longest - strlen(o->name) + 3;
                         for(j=0; j<pad; j++)
                             putchar(' ');
-                        fputs(options[i]->description, stdout);
+                        fputs(o->description, stdout);
                     }
                     putchar('\n');
                 }
