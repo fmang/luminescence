@@ -10,12 +10,13 @@ Lumi lumi;
 typedef struct {
     void *handle;
     KeyCallback *key_callback;
+    Option *options;
 } Plugin;
 
 Plugin *plugins = 0;
 int plugin_count = 0;
 
-Option *options = 0;
+Option **options = 0;
 int option_count = 0;
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
@@ -50,14 +51,13 @@ void load_plugin(const char *path){
     plugin->key_callback = dlsym(handle, "key_callback");
 
     // Options
-    Option *plugin_options = dlsym(handle, "options");
-    if(plugin_options){
-        size_t plugin_option_count = 0;
-        while((plugin_options)[plugin_option_count].name)
-            plugin_option_count++;
-        options = (Option*) realloc(options, sizeof(Option) * (option_count + plugin_option_count));
-        memcpy(options + option_count, plugin_options, sizeof(Option) * plugin_option_count);
-        option_count += plugin_option_count;
+    plugin->options = dlsym(handle, "options");
+    if(plugin->options){
+        Option *o = plugin->options;
+        for(; o->name; o++){
+            options = (Option**) realloc(options, sizeof(Option*) * (option_count+1));
+            options[option_count++] = o;
+        }
     }
 }
 
@@ -83,17 +83,17 @@ void load_plugins(){
 void set_option(const char *opt, const char *val){
     int i = 0;
     for(; i<option_count; i++){
-        if(strcmp(options[i].name, opt) == 0)
+        if(strcmp(options[i]->name, opt) == 0)
             break;
     }
     if(i == option_count)
         fprintf(stderr, "unknown option %s\n", opt);
-    else if(options[i].argument == REQUIRED_ARGUMENT && !val)
+    else if(options[i]->argument == REQUIRED_ARGUMENT && !val)
         fprintf(stderr, "missing argument for option %s\n", opt);
     else{
-        if(options[i].argument == NO_ARGUMENT && val)
+        if(options[i]->argument == NO_ARGUMENT && val)
             fprintf(stderr, "warning: option %s takes no argument\n", opt);
-        options[i].callback(val);
+        options[i]->callback(val);
     }
 }
 
@@ -139,17 +139,17 @@ int main(int argc, char **argv){
                 int i, j, pad;
                 int longest = 0;
                 for(i=0; i<option_count; i++){
-                    if(strlen(options[i].name) > longest)
-                        longest = strlen(options[i].name);
+                    if(strlen(options[i]->name) > longest)
+                        longest = strlen(options[i]->name);
                 }
                 for(i=0; i<option_count; i++){
                     fputs("  ", stdout);
-                    fputs(options[i].name, stdout);
-                    if(options[i].description){
-                        pad = longest - strlen(options[i].name) + 3;
+                    fputs(options[i]->name, stdout);
+                    if(options[i]->description){
+                        pad = longest - strlen(options[i]->name) + 3;
                         for(j=0; j<pad; j++)
                             putchar(' ');
-                        fputs(options[i].description, stdout);
+                        fputs(options[i]->description, stdout);
                     }
                     putchar('\n');
                 }
@@ -198,15 +198,15 @@ int main(int argc, char **argv){
     opts[option_count].name = 0;
     int arg;
     for(i=0; i<option_count; i++){
-        arg = options[i].argument;
-        opts[i].name = options[i].name;
+        arg = options[i]->argument;
+        opts[i].name = options[i]->name;
         opts[i].has_arg = arg == OPTIONAL_ARGUMENT ? optional_argument :
                           arg == REQUIRED_ARGUMENT ? required_argument : no_argument;
         opts[i].flag = 0;
     }
     while(i=-1, getopt_long(argc, argv, "", opts, &i) != -1){
         if(i != -1)
-            options[i].callback(optarg);
+            options[i]->callback(optarg);
     }
     free(opts);
 
