@@ -136,15 +136,22 @@ int main(int argc, char **argv){
             puts("Usage: luminescence --OPTION[=VALUE] ...");
             if(option_count){
                 puts("Available options:");
-                int i = 0;
-                for(; i<option_count; i++){
+                int i, j, pad;
+                int longest = 0;
+                for(i=0; i<option_count; i++){
+                    if(strlen(options[i].name) > longest)
+                        longest = strlen(options[i].name);
+                }
+                for(i=0; i<option_count; i++){
                     fputs("  ", stdout);
                     fputs(options[i].name, stdout);
                     if(options[i].description){
-                        fputs(": ", stdout);
+                        pad = longest - strlen(options[i].name) + 3;
+                        for(j=0; j<pad; j++)
+                            putchar(' ');
                         fputs(options[i].description, stdout);
                     }
-                    fputs("\n", stdout);
+                    putchar('\n');
                 }
             }
             return 0;
