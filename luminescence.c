@@ -7,22 +7,25 @@
 
 Lumi lumi;
 
-void **plugins = 0;
-int plugin_count = 0;
+typedef struct {
+    void *handle;
+    KeyCallback *key_callback;
+} Plugin;
 
-KeyCallback **key_callbacks = 0;
-KeyCallback *key_grabber = 0;
-int key_callback_count = 0;
+Plugin *plugins = 0;
+int plugin_count = 0;
 
 Option *options = 0;
 int option_count = 0;
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     int i = 0, code;
-    for(; i<key_callback_count; i++){
-        code = (*(key_grabber ? key_grabber : key_callbacks[i]))(event);
+    static KeyCallback *key_grabber = 0;
+    for(; i<plugin_count; i++){
+        if(!key_grabber && !plugins[i].key_callback) continue;
+        code = (*(key_grabber ? key_grabber : plugins[i].key_callback))(event);
         if(code & FOCUS_GRAB){
-            if(!key_grabber) key_grabber = key_callbacks[i];
+            if(!key_grabber) key_grabber = plugins[i].key_callback;
             return code & EVENT_STOP ? TRUE : FALSE;
         }
         else if(key_grabber){
@@ -36,21 +39,18 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
 }
 
 void load_plugin(const char *path){
-    void *plugin = dlopen(path, RTLD_LAZY);
-    if(!plugin) return;
+    void *handle = dlopen(path, RTLD_LAZY);
+    if(!handle) return;
 
-    plugins = (void**) realloc(plugins, sizeof(void*) * (plugin_count+1));
-    plugins[plugin_count++] = plugin;
+    plugins = (Plugin*) realloc(plugins, sizeof(Plugin) * (plugin_count+1));
+    Plugin *plugin = plugins + plugin_count++;
+    plugin->handle = handle;
 
     // Key callback
-    KeyCallback* plugin_key_callback = dlsym(plugin, "key_callback");
-    if(plugin_key_callback){
-        key_callbacks = (KeyCallback**) realloc(key_callbacks, sizeof(KeyCallback*) * (key_callback_count+1));
-        key_callbacks[key_callback_count++] = plugin_key_callback;
-    }
+    plugin->key_callback = dlsym(handle, "key_callback");
 
     // Options
-    Option *plugin_options = dlsym(plugin, "options");
+    Option *plugin_options = dlsym(handle, "options");
     if(plugin_options){
         size_t plugin_option_count = 0;
         while((plugin_options)[plugin_option_count].name)
@@ -188,7 +188,7 @@ int main(int argc, char **argv){
     int i;
     void (*plugin_init)(Lumi*);
     for(i=0; i<plugin_count; i++){
-        plugin_init = dlsym(plugins[i], "init");
+        plugin_init = dlsym(plugins[i].handle, "init");
         if(plugin_init) (*plugin_init)(&lumi);
     }
 
@@ -216,7 +216,7 @@ int main(int argc, char **argv){
 
     // Clean up
     for(i=0; i<plugin_count; i++)
-        dlclose(plugins[i]);
+        dlclose(plugins[i].handle);
 
     return 0;
 }
