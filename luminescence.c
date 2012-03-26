@@ -109,25 +109,20 @@ void load_config(){
     FILE *f = fopen("config", "r");
     if(!f) return;
     char *line = 0;
-    size_t n = 0;
-    char *name=0, *space;
+    size_t n = 0, count;
+    char *name;
     while(getline(&line, &n, f) != -1){
         if(line[0] == '\0') continue; // null
         if(line[0] == '\n' || line[0] == '#') continue; // comment or empty
-        if(line[strlen(line)-1] == '\n')
-            line[strlen(line)-1] = '\0'; // drop the newline
-        space = strchr(line, ' ');
-        if(!space)
-            set_option(line, 0);
-        else{
-            name = (char*) realloc(name, space-line+1);
-            strncpy(name, line, space-line);
-            while(*space == ' ') space++;
-            set_option(name, space);
-        }
+        for(count = 0; line[count] != '\0' && line[count] != '\n'; count++);
+        line[count] = '\0'; // drop the newline
+        for(count = 0; line[count] != '\0' && line[count] != ' '; count++);
+        name = strndup(line, count);
+        while(line[count] == ' ') count++;
+        set_option(name, line[count] == '\0' ? 0 : line + count);
+        free(name);
     }
     free(line);
-    if(name) free(name);
     fclose(f);
 }
 
