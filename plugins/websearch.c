@@ -26,7 +26,7 @@ void setup(const char *name, const char *url){
 
 void search(){
     const gchar *input = gtk_entry_get_text(GTK_ENTRY(search_entry));
-    gchar *uri = (gchar*) malloc(strlen(search_url)+strlen(input));
+    gchar *uri = (gchar*) malloc(strlen(search_url)+strlen(input)+1);
     strcpy(uri, search_url);
     strcat(uri, input);
     webkit_web_view_load_uri(WEBKIT_WEB_VIEW(web_view), uri);
