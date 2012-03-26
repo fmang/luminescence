@@ -1,12 +1,16 @@
 #include <luminescence.h>
 
-GtkWidget *web_view;
-GtkWidget *scripts_label;
+bool enabled = FALSE;
+GtkWidget *web_view = 0;
+GtkWidget *scripts_label = 0;
 
 void scripts_set_enabled(gboolean enable){
-    g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(web_view)),
-        "enable-scripts", enable, "enable-plugins", enable, NULL);
-    gtk_widget_set_visible(scripts_label, enable);
+    enabled = enable;
+    if(web_view)
+        g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(web_view)),
+            "enable-scripts", enable, "enable-plugins", enable, NULL);
+    if(scripts_label)
+        gtk_widget_set_visible(scripts_label, enable);
 }
 
 void enable_scripts(){ scripts_set_enabled(TRUE); }
@@ -29,5 +33,5 @@ void init(Lumi *l){
     web_view = l->web_view;
     scripts_label = gtk_label_new("JS");
     gtk_box_pack_start(GTK_BOX(l->status_bar), scripts_label, FALSE, FALSE, 3);
-    disable_scripts();
+    scripts_set_enabled(enabled);
 }

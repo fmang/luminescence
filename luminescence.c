@@ -207,16 +207,11 @@ int main(int argc, char **argv){
     gtk_box_pack_start(GTK_BOX(layout), lumi.status_bar, FALSE, FALSE, 0);
     gtk_widget_show(lumi.status_bar);
 
-    // Plugins
-    int i;
-    for(i=0; i<plugin_count; i++)
-        if(plugins[i].init) (*plugins[i].init)(&lumi);
-
     // Options
     load_config();
     struct option *opts = (struct option*) malloc(sizeof(struct option) * (option_count+1));
     opts[option_count].name = 0;
-    int arg;
+    int i, arg;
     for(i=0; i<option_count; i++){
         arg = options[i]->argument;
         opts[i].name = options[i]->name;
@@ -229,6 +224,9 @@ int main(int argc, char **argv){
             options[i]->callback(optarg);
     }
     free(opts);
+
+    for(i=0; i<plugin_count; i++)
+        if(plugins[i].init) (*plugins[i].init)(&lumi);
 
     // Exec
     gtk_widget_show(lumi.window);
