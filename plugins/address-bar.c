@@ -35,6 +35,13 @@ int key_callback(GdkEventKey *e){
         gtk_widget_grab_focus(entry);
         return FOCUS_GRAB | EVENT_STOP;
     }
+    else if(e->keyval == GDK_KEY_y){
+        gchar *txt = gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY));
+        gtk_entry_set_text(GTK_ENTRY(entry), txt ? txt : "");
+        if(txt) g_free(txt);
+        gtk_widget_show(entry);
+        gtk_widget_grab_focus(entry);
+    }
     return EVENT_PROPAGATE;
 }
 
