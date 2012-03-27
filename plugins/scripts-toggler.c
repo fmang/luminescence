@@ -1,5 +1,9 @@
 #include <luminescence.h>
 
+const char *name = "Scripts toggler";
+
+const char *description = "Press s/S to disable/enable scripts and plugins.";
+
 bool enabled = FALSE;
 GtkWidget *web_view = 0;
 GtkWidget *scripts_label = 0;
@@ -32,6 +36,6 @@ int key_callback(GdkEventKey *e){
 void init(Lumi *l){
     web_view = l->web_view;
     scripts_label = gtk_label_new("JS");
-    gtk_box_pack_start(GTK_BOX(l->status_bar), scripts_label, FALSE, FALSE, 3);
+    gtk_box_pack_end(GTK_BOX(l->status_bar), scripts_label, FALSE, FALSE, 3);
     scripts_set_enabled(enabled);
 }
