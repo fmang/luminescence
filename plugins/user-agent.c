@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+const char *name = "User Agent";
+
 char *user_agent = 0;
 GtkWidget *web_view = 0;
 

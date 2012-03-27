@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+const char *name = "Address bar";
+
+const char *description = "Press o to input an URL.";
+
 GtkWidget *web_view;
 GtkWidget *entry;
 

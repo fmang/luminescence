@@ -1,5 +1,9 @@
 #include <luminescence.h>
 
+const char *name = "Scroll";
+
+const char *description = "Scroll using the hjkl keys (left, bottom, top, right, respectively).";
+
 GtkWidget *web_view;
 
 int key_callback(GdkEventKey *e){

@@ -1,5 +1,9 @@
 #include <luminescence.h>
 
+const char *name = "URI viewer";
+
+const char *description = "Press u to display the current page's or the hovered link's URI.";
+
 GtkWidget *uri_label;
 
 void update_uri(GtkWidget *view){

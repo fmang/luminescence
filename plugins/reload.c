@@ -1,5 +1,9 @@
 #include <luminescence.h>
 
+const char *name = "Reload";
+
+const char *description = "Press r to reload the current page. R to bypass the cache.";
+
 GtkWidget *web_view;
 
 int key_callback(GdkEventKey *e){
