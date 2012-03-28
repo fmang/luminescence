@@ -29,5 +29,5 @@ OPTIONS
     no-scripts
     user-agent Luminescence
 
-  Alternatively, you can set the options from the command-line (luminescence uses getopt):
+  Alternatively, you can set the options from the command line:
     luminescence --no-scripts --user-agent Luminescence

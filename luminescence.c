@@ -3,7 +3,6 @@
 #include <string.h>
 #include <dirent.h>
 #include <dlfcn.h>
-#include <getopt.h>
 
 Lumi lumi;
 
@@ -121,6 +120,31 @@ void load_config(){
     fclose(f);
 }
 
+void parse_arguments(int argc, char **argv){
+    int i, eq;
+    char *arg = 0;
+    for(i=1; i<argc; i++){
+        if(argv[i][0] == '\0') continue;
+        if(argv[i][0] == '-' && argv[i][1] == '-'){
+            if(arg) set_option(arg, 0);
+            for(eq=0; argv[i][2+eq] != '=' && argv[i][2+eq] != '\0'; eq++);
+            if(argv[i][2+eq] == '='){
+                arg = strndup(argv[i]+2, eq);
+                set_option(arg, argv[i]+3+eq);
+                free(arg);
+                arg = 0;
+            }
+            else
+                arg = argv[i]+2;
+        }
+        else if(arg){
+            set_option(arg, argv[i]);
+            arg = 0;
+        }
+    }
+    if(arg) set_option(arg, 0);
+}
+
 void print_help(){
     puts("Usage: luminescence --OPTION[=VALUE] ...\n");
     if(!plugin_count){
@@ -204,20 +228,10 @@ int main(int argc, char **argv){
 
     // Options
     load_config();
-    struct option *opts = (struct option*) malloc(sizeof(struct option) * (option_count+1));
-    opts[option_count].name = 0;
-    int i;
-    for(i=0; i<option_count; i++){
-        opts[i].name = options[i]->name;
-        opts[i].has_arg = optional_argument;
-        opts[i].flag = 0;
-    }
-    while(i=-1, getopt_long(argc, argv, "", opts, &i) != -1){
-        if(i != -1)
-            options[i]->callback(optarg);
-    }
-    free(opts);
+    parse_arguments(argc, argv);
 
+    // Init plugins
+    int i;
     for(i=0; i<plugin_count; i++)
         if(plugins[i].init) (*plugins[i].init)(&lumi);
 
