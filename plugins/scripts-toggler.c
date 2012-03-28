@@ -21,8 +21,8 @@ void enable_scripts(){ scripts_set_enabled(TRUE); }
 void disable_scripts(){ scripts_set_enabled(FALSE); }
 
 Option options[] = {
-    { "scripts", NO_ARGUMENT, enable_scripts, "Enable scripts by default." },
-    { "no-scripts", NO_ARGUMENT, disable_scripts, "Disable scripts (default)." },
+    { "scripts", enable_scripts, "Enable scripts by default." },
+    { "no-scripts", disable_scripts, "Disable scripts (default)." },
     { 0 } };
 
 int key_callback(GdkEventKey *e){

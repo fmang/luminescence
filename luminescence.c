@@ -96,13 +96,8 @@ void set_option(const char *opt, const char *val){
     }
     if(i == option_count)
         fprintf(stderr, "unknown option %s.\n", opt);
-    else if(options[i]->argument == REQUIRED_ARGUMENT && !val)
-        fprintf(stderr, "missing argument for option %s.\n", opt);
-    else{
-        if(options[i]->argument == NO_ARGUMENT && val)
-            fprintf(stderr, "warning: option %s takes no argument.\n", opt);
+    else
         options[i]->callback(val);
-    }
 }
 
 void load_config(){
@@ -211,12 +206,10 @@ int main(int argc, char **argv){
     load_config();
     struct option *opts = (struct option*) malloc(sizeof(struct option) * (option_count+1));
     opts[option_count].name = 0;
-    int i, arg;
+    int i;
     for(i=0; i<option_count; i++){
-        arg = options[i]->argument;
         opts[i].name = options[i]->name;
-        opts[i].has_arg = arg == OPTIONAL_ARGUMENT ? optional_argument :
-                          arg == REQUIRED_ARGUMENT ? required_argument : no_argument;
+        opts[i].has_arg = optional_argument;
         opts[i].flag = 0;
     }
     while(i=-1, getopt_long(argc, argv, "", opts, &i) != -1){

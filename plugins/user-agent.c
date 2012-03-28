@@ -14,11 +14,11 @@ void update_user_agent(){
 
 void set_user_agent(const char *agent){
     if(user_agent) free(user_agent);
-    user_agent = strdup(agent);
+    user_agent = agent ? strdup(agent) : 0;
 }
 
 Option options[] = {
-    { "user-agent", REQUIRED_ARGUMENT, set_user_agent },
+    { "user-agent", set_user_agent },
     { 0 } };
 
 void init(Lumi *lumi){

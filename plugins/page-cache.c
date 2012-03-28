@@ -18,7 +18,7 @@ void page_cache_set_enabled(gboolean enable){
 void disable_page_cache(){ page_cache_set_enabled(FALSE); }
 
 Option options[] = {
-    { "no-page-cache", NO_ARGUMENT, disable_page_cache },
+    { "no-page-cache", disable_page_cache },
     { 0 } };
 
 void init(Lumi *lumi){

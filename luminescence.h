@@ -23,13 +23,8 @@ typedef int KeyCallback(GdkEventKey*);
 
 // Options
 
-#define NO_ARGUMENT       0
-#define OPTIONAL_ARGUMENT 1
-#define REQUIRED_ARGUMENT 2
-
 typedef struct {
     const char *name;
-    int argument;
     void (*callback)(const char*);
     const char *description;
 } Option;
