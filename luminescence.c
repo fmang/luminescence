@@ -91,12 +91,8 @@ void set_option(const char *opt, const char *val){
     int i = 0;
     for(; i<option_count; i++){
         if(strcmp(options[i]->name, opt) == 0)
-            break;
+            options[i]->callback(val);
     }
-    if(i == option_count)
-        fprintf(stderr, "unknown option %s.\n", opt);
-    else
-        options[i]->callback(val);
 }
 
 void load_config(){
