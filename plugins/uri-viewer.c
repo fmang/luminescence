@@ -16,20 +16,18 @@ void link_hovered(WebKitWebView *view, gchar *title, gchar *uri){
 }
 
 int key_callback(GdkEventKey *e){
-    if(e->keyval == GDK_KEY_Escape){
-        gtk_widget_hide(uri_label);
-        return FOCUS_RELEASE | EVENT_PROPAGATE;
-    }
-    else if(gtk_widget_get_visible(uri_label) && e->keyval == GDK_KEY_y){
+    if(gtk_widget_get_visible(uri_label) && e->keyval == GDK_KEY_y){
         gtk_clipboard_set_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY), gtk_label_get_text(GTK_LABEL(uri_label)), -1);
         gtk_widget_hide(uri_label);
         return FOCUS_RELEASE | EVENT_STOP;
     }
-    else if(gtk_widget_get_visible(uri_label))
-        return FOCUS_GRAB | EVENT_STOP;
     else if(e->keyval == GDK_KEY_u){
         gtk_widget_show(uri_label);
         return FOCUS_GRAB | EVENT_STOP;
+    }
+    else if(gtk_widget_get_visible(uri_label)){
+        gtk_widget_hide(uri_label);
+        return FOCUS_RELEASE | EVENT_PROPAGATE;
     }
     return EVENT_PROPAGATE;
 }
