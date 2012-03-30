@@ -8,6 +8,7 @@ typedef struct {
     GtkWidget *window;     // GtkWindow
     GtkWidget *status_bar; // GtkBox
     GtkWidget *web_view;   // WebKitWebView
+    void (*focus)(void);
 } Lumi;
 
 typedef struct {

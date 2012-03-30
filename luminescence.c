@@ -30,6 +30,12 @@ typedef struct {
 Binding *bindings = 0;
 int binding_count = 0;
 
+int focused = 0;
+
+void focus(){
+    focused = 1;
+}
+
 void load_plugin(const char *filename){
     char path[256];
     strcpy(path, "plugins/");
@@ -188,6 +194,12 @@ void print_help(){
 }
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
+    if(event->keyval == GDK_KEY_Escape){
+        run_command("leave", 0);
+        focused = 0;
+        return FALSE;
+    }
+    if(focused) return FALSE;
     int i = 0;
     for(; i<binding_count; i++){
         if(bindings[i].key == event->keyval)
@@ -202,6 +214,7 @@ int main(int argc, char **argv){
     strcat(lumi_dir, "/.luminescence");
     chdir(lumi_dir);
 
+    lumi.focus = focus;
     load_plugins();
 
     // Help
