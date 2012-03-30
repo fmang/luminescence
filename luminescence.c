@@ -208,6 +208,35 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     return TRUE;
 }
 
+bool ready = 0;
+char **delayed_commands = 0;
+char **delayed_arguments = 0;
+int delayed_count = 0;
+
+void run_command_delayed(const char *cmd, const char *arg){
+    if(ready){
+        run_command(cmd, arg);
+        return;
+    }
+    delayed_commands = (char**) realloc(delayed_commands, sizeof(char*) * (delayed_count+1));
+    delayed_arguments = (char**) realloc(delayed_arguments, sizeof(char*) * (delayed_count+1));
+    delayed_commands[delayed_count] = strdup(cmd);
+    delayed_arguments[delayed_count] = strdup(arg);
+    delayed_count++;
+}
+
+void run_delayed_commands(){
+    ready = 1;
+    int i = 0;
+    for(; i<delayed_count; i++){
+        run_command(delayed_commands[i], delayed_arguments[i]);
+        free(delayed_commands[i]);
+        free(delayed_arguments[i]);
+    }
+    free(delayed_commands);
+    free(delayed_arguments);
+}
+
 int main(int argc, char **argv){
     char *lumi_dir = strdup(getenv("HOME"));
     lumi_dir = realloc(lumi_dir, strlen(lumi_dir) + 15);
@@ -215,6 +244,7 @@ int main(int argc, char **argv){
     chdir(lumi_dir);
 
     lumi.focus = focus;
+    lumi.exec = run_command_delayed;
     load_plugins();
 
     // Help
@@ -258,6 +288,7 @@ int main(int argc, char **argv){
     load_config("keys", 1);
     load_config("config", 0);
     parse_arguments(argc, argv);
+    run_delayed_commands();
 
     // Exec
     gtk_widget_show(lumi.window);
