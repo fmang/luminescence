@@ -204,14 +204,12 @@ int main(int argc, char **argv){
     gtk_box_pack_start(GTK_BOX(layout), lumi.status_bar, FALSE, FALSE, 0);
     gtk_widget_show(lumi.status_bar);
 
-    // Options
-    load_config();
-    parse_arguments(argc, argv);
-
-    // Init plugins
+    // Plugins
     int i;
     for(i=0; i<plugin_count; i++)
         if(plugins[i].init) (*plugins[i].init)(&lumi);
+    load_config();
+    parse_arguments(argc, argv);
 
     // Exec
     gtk_widget_show(lumi.window);
