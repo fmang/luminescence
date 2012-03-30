@@ -82,20 +82,12 @@ void run_command(const char *cmd, const char *arg){
     }
 }
 
-int read_key(const char *key){
-    if(strlen(key) == 1)
-        return *key;
-    if(strcasecmp(key, "esc") == 0)
-        return GDK_KEY_Escape;
-    return 0;
-}
-
 void load_config(const char *file, int is_keys){
     FILE *f = fopen(file, "r");
     if(!f) return;
     char *line = 0, *cur = 0;
     size_t n = 0, count;
-    char *command, *keyname;
+    char *command;
     guint key;
     while(getline(&line, &n, f) != -1){
         for(cur = line; *cur == ' '; cur++); // skip spaces
@@ -105,12 +97,9 @@ void load_config(const char *file, int is_keys){
         *cur = '\0'; // drop the line feed
         for(cur = line; *cur == ' '; cur++); // rewind
         if(is_keys){
-            for(count = 0; cur[count] != '\0' && cur[count] != ' '; count++);
-            keyname = strndup(cur, count);
-            key = read_key(keyname);
-            free(keyname);
-            if(!key) continue; // unknown key
-            cur += count;
+            if(cur[1] != ' ') continue; // only one-letter keys are allowed
+            key = *cur;
+            cur++;
             while(*cur == ' ') cur++; // skip spaces
         }
         if(*cur == '\0') continue;
