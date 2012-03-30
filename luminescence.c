@@ -21,9 +21,14 @@ int plugin_count = 0;
 Command **commands = 0;
 int command_count = 0;
 
-bool on_key_press(GtkWidget *widget, GdkEventKey *event){
-    return TRUE;
-}
+typedef struct {
+    guint key;
+    char *command;
+    char *argument;
+} Binding;
+
+Binding *bindings = 0;
+int binding_count = 0;
 
 void load_plugin(const char *filename){
     char path[256];
@@ -77,22 +82,53 @@ void run_command(const char *cmd, const char *arg){
     }
 }
 
-void load_config(){
-    FILE *f = fopen("config", "r");
+int read_key(const char *key){
+    if(strlen(key) == 1)
+        return *key;
+    if(strcasecmp(key, "esc") == 0)
+        return GDK_KEY_Escape;
+    return 0;
+}
+
+void load_config(const char *file, int is_keys){
+    FILE *f = fopen(file, "r");
     if(!f) return;
-    char *line = 0;
+    char *line = 0, *cur = 0;
     size_t n = 0, count;
-    char *name;
+    char *command, *keyname;
+    guint key;
     while(getline(&line, &n, f) != -1){
-        if(line[0] == '\0') continue; // null
-        if(line[0] == '\n' || line[0] == '#') continue; // comment or empty
-        for(count = 0; line[count] != '\0' && line[count] != '\n'; count++);
-        line[count] = '\0'; // drop the newline
-        for(count = 0; line[count] != '\0' && line[count] != ' '; count++);
-        name = strndup(line, count);
-        while(line[count] == ' ') count++;
-        run_command(name, line[count] == '\0' ? 0 : line + count);
-        free(name);
+        for(cur = line; *cur == ' '; cur++); // skip spaces
+        if(*cur == '\0') continue; // null
+        if(*cur == '\n' || *cur == '#') continue; // comment or empty
+        while(*cur != '\0' && *cur != '\n') cur++;
+        *cur = '\0'; // drop the line feed
+        for(cur = line; *cur == ' '; cur++); // rewind
+        if(is_keys){
+            for(count = 0; cur[count] != '\0' && cur[count] != ' '; count++);
+            keyname = strndup(cur, count);
+            key = read_key(keyname);
+            free(keyname);
+            if(!key) continue; // unknown key
+            cur += count;
+            while(*cur == ' ') cur++; // skip spaces
+        }
+        if(*cur == '\0') continue;
+        for(count = 0; cur[count] != '\0' && cur[count] != ' '; count++);
+        command = strndup(cur, count);
+        cur += count;
+        while(*cur == ' ') cur++; // skip spaces
+        if(is_keys){
+            bindings = (Binding*) realloc(bindings, sizeof(Binding) * (binding_count+1));
+            Binding *b = bindings + binding_count++;
+            b->key = key;
+            b->command = command;
+            b->argument = *cur == '\0' ? 0 : strdup(cur);
+        }
+        else{
+            run_command(command, *cur == '\0' ? 0 : cur);
+            free(command);
+        }
     }
     free(line);
     fclose(f);
@@ -162,6 +198,15 @@ void print_help(){
     }
 }
 
+bool on_key_press(GtkWidget *widget, GdkEventKey *event){
+    int i = 0;
+    for(; i<binding_count; i++){
+        if(bindings[i].key == event->keyval)
+            run_command(bindings[i].command, bindings[i].argument);
+    }
+    return TRUE;
+}
+
 int main(int argc, char **argv){
     char *lumi_dir = strdup(getenv("HOME"));
     lumi_dir = realloc(lumi_dir, strlen(lumi_dir) + 15);
@@ -208,7 +253,8 @@ int main(int argc, char **argv){
     int i;
     for(i=0; i<plugin_count; i++)
         if(plugins[i].init) (*plugins[i].init)(&lumi);
-    load_config();
+    load_config("keys", 1);
+    load_config("config", 0);
     parse_arguments(argc, argv);
 
     // Exec
