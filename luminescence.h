@@ -10,23 +10,10 @@ typedef struct {
     GtkWidget *web_view;   // WebKitWebView
 } Lumi;
 
-// Events
-
-#define EVENT_PROPAGATE 0
-#define EVENT_STOP      1
-
-#define FOCUS_RELEASE   0
-#define FOCUS_GRAB      2
-
-// Returns an OR'd combination of the above flags.
-typedef int KeyCallback(GdkEventKey*);
-
-// Options
-
 typedef struct {
     const char *name;
-    void (*callback)(const char*);
-    const char *description;
-} Option;
+    void (*exec)(const char*);
+    const char *help;
+} Command;
 
 #endif // LUMINESCENCE_H
