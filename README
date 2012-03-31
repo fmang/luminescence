@@ -30,6 +30,7 @@ COMMANDS
 CONFIGURATION
 
   This requires the exec.c plugin.
+  Alternatively, you can configure Luminescence directly from C. Have a look at luminescence.h.
 
   The default configuration file is stored in ~/.luminescence/config:
     # Sample configuration file
@@ -37,17 +38,15 @@ CONFIGURATION
     scripts off
     uri http://foo/homepage
 
-KEY BINDINGS
+  KEY BINDINGS
 
-  This requires the exec.c plugin.
+    You'll want to set up key bindings.
+    For example, you can write into ~/.luminescence/keys:
+      # Sample keys file
+      i insert-mode
+      o uri-hide
+      o uri-edit
+      r reload
 
-  You'll want to set up key bindings.
-  For example, you can write into ~/.luminescence/keys:
-    # Sample keys file
-    i insert-mode
-    o uri-hide
-    o uri-edit
-    r reload
-
-  To load it, append into ~/.luminescence/config:
-    key-bindings keys
+    To load it, append into ~/.luminescence/config:
+      key-bindings keys
