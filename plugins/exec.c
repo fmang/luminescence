@@ -58,6 +58,7 @@ void unbind_keys(){
     for(; i<binding_count; i++)
         lumi_unbind(bindings[i]);
     free(bindings);
+    bindings = 0;
     binding_count = 0;
 }
 

@@ -197,6 +197,7 @@ struct Binding {
 };
 
 struct Binding *bindings = 0;
+struct Binding *last_binding = 0;
 
 void* add_binding(guint mods, guint key, const char *cmd, const char *arg){
     struct Binding *b = malloc(sizeof(struct Binding));
@@ -204,19 +205,27 @@ void* add_binding(guint mods, guint key, const char *cmd, const char *arg){
     b->modifiers = mods;
     b->command = cmd;
     b->argument = arg;
-    b->next = bindings;
-    bindings = b;
+    b->next = 0;
+    if(!bindings)
+        bindings = last_binding = b;
+    else{
+        if(!last_binding)
+            for(last_binding=bindings; last_binding->next; last_binding=last_binding->next);
+        last_binding->next = b;
+        last_binding = b;
+    }
     return b;
 }
 
 void remove_binding(void *b){
-    struct Binding *i = bindings;
-    if(i == b){
-        bindings = i->next;
+    last_binding = 0; // make it obsolete
+    if(b == bindings){
+        bindings = bindings->next;
         free(b);
         return;
     }
-    for(; i; i = i->next){
+    struct Binding *i = bindings;
+    for(; i->next; i=i->next){
         if(i->next == b){
             i->next = i->next->next;
             free(b);
