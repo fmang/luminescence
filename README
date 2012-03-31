@@ -19,15 +19,35 @@ PLUGINS
   For example, to install all the available plugins:
     luminescence-install /usr/src/luminescence/plugins/*.c
 
-OPTIONS
+COMMANDS
 
-  You can list the available options with:
+  You can list the available commands with:
     luminescence --help
 
-  The configuration is stored in ~/.luminescence/config:
-    # Sample configuration file
-    no-scripts
-    user-agent Luminescence
+  To execute commands from the command line:
+    luminescence --scripts off --user-agent Luminescence
 
-  Alternatively, you can set the options from the command line:
-    luminescence --no-scripts --user-agent Luminescence
+CONFIGURATION
+
+  This requires the exec.c plugin.
+
+  The default configuration file is stored in ~/.luminescence/config:
+    # Sample configuration file
+    user-agent Luminescence
+    scripts off
+    uri http://foo/homepage
+
+KEY BINDINGS
+
+  This requires the exec.c plugin.
+
+  You'll want to set up key bindings.
+  For example, you can write into ~/.luminescence/keys:
+    # Sample keys file
+    i insert-mode
+    o uri-hide
+    o uri-edit
+    r reload
+
+  To load it, append into ~/.luminescence/config:
+    key-bindings keys
