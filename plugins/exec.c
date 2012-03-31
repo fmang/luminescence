@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-void (*exec)(const char*, const char*);
-void* (*bind_key)(guint, guint, const char*, const char*);
+Lumi *lumi;
+
+void **bindings = 0;
+int binding_count;
 
 void run(const char *line, int is_keys){
     const char *cur = 0;
@@ -24,10 +26,12 @@ void run(const char *line, int is_keys){
     command = strndup(cur, count);
     cur += count;
     while(*cur == ' ') cur++; // skip spaces
-    if(is_keys)
-        (*bind_key)(0, key, command, *cur == '\0' ? 0 : strdup(cur));
+    if(is_keys){
+        bindings = (void**) realloc(bindings, sizeof(void*) * (binding_count+1));
+        bindings[binding_count++] = lumi_bind(key, command, *cur == '\0' ? 0 : strdup(cur));
+    }
     else{
-        (*exec)(command, *cur == '\0' ? 0 : cur);
+        lumi_exec(command, *cur == '\0' ? 0 : cur);
         free(command);
     }
 }
@@ -49,14 +53,20 @@ void interpret(const char *file, bool is_bind){
 void read_file(const char *f){ interpret(f, 0); }
 void read_keys(const char *f){ interpret(f, 1); }
 
+void unbind_keys(){
+    int i = 0;
+    for(; i<binding_count; i++)
+        lumi_unbind(bindings[i]);
+    free(bindings);
+    binding_count = 0;
+}
+
 Command commands[] = {
     { "run", read_file },
-    { "keys", read_keys },
+    { "key-bindings", read_keys },
+    { "clear-bindings", unbind_keys },
     { 0 } };
 
-void init(Lumi *lumi){
-    exec = lumi->exec;
-    bind_key = lumi->bind;
+void init(){
     read_file("config");
-    read_keys("keys");
 }

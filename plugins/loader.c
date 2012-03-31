@@ -1,22 +1,11 @@
 #include <luminescence.h>
-#include <stdlib.h>
-#include <string.h>
 
 const char *name = "URI Loader";
 
-const char *description = "Loads an URI when started.";
+Lumi *lumi;
 
-GtkWidget *web_view = 0;
-
-char *uri = 0;
-
-void set_uri(const char *new_uri){
-    if(web_view)
-        webkit_web_view_load_uri(WEBKIT_WEB_VIEW(web_view), new_uri);
-    else{
-        if(uri) free(uri);
-        uri = strdup(new_uri);
-    }
+void set_uri(const char *uri){
+    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(lumi->web_view), uri);
 }
 
 void new_window(WebKitWebView *view){
@@ -29,20 +18,15 @@ void new_window(WebKitWebView *view){
 }
 
 WebKitWebView* create_web_view(){
-    WebKitWebView* new_view = WEBKIT_WEB_VIEW(webkit_web_view_new());
-    g_signal_connect(new_view, "notify::uri", G_CALLBACK(new_window), NULL);
-    return new_view;
+    WebKitWebView* view = WEBKIT_WEB_VIEW(webkit_web_view_new());
+    g_signal_connect(view, "notify::uri", G_CALLBACK(new_window), NULL);
+    return view;
 }
 
-Option options[] = {
+Command commands[] = {
     { "uri", set_uri },
-    { 0 }};
+    { 0 } };
 
-void init(Lumi *lumi){
-    web_view = lumi->web_view;
-    g_signal_connect(web_view, "create-web-view", G_CALLBACK(create_web_view), NULL);
-    if(uri){
-        set_uri(uri);
-        free(uri);
-    }
+void init(){
+    g_signal_connect(lumi->web_view, "create-web-view", G_CALLBACK(create_web_view), NULL);
 }

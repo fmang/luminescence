@@ -2,22 +2,17 @@
 
 const char *name = "Reload";
 
-const char *description = "Press r to reload the current page. R to bypass the cache.";
+Lumi *lumi;
 
-GtkWidget *web_view;
-
-int key_callback(GdkEventKey *e){
-    switch(e->keyval){
-        case GDK_KEY_r:
-            webkit_web_view_reload(WEBKIT_WEB_VIEW(web_view));
-            return EVENT_STOP;
-        case GDK_KEY_R:
-            webkit_web_view_reload_bypass_cache(WEBKIT_WEB_VIEW(web_view));
-            return EVENT_STOP;
-    }
-    return EVENT_PROPAGATE;
+void reload(){
+    webkit_web_view_reload(WEBKIT_WEB_VIEW(lumi->web_view));
 }
 
-void init(Lumi *lumi){
-    web_view = lumi->web_view;
+void reload_nocache(){
+    webkit_web_view_reload_bypass_cache(WEBKIT_WEB_VIEW(lumi->web_view));
 }
+
+Command commands[] = {
+    { "reload", reload },
+    { "Reload", reload_nocache, "Bypass the cache." },
+    { 0 } };

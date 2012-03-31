@@ -1,19 +1,18 @@
 #include <luminescence.h>
 
 const char *name = "Back";
+const char *description = "Hit Backspace to go back one page.";
 
-const char *description = "Press Backspace to go back one page.";
+Lumi *lumi;
 
-GtkWidget *web_view;
-
-int key_callback(GdkEventKey *e){
-    if(e->keyval == GDK_KEY_BackSpace){
-        webkit_web_view_go_back(WEBKIT_WEB_VIEW(web_view));
-        return EVENT_STOP;
-    }
-    return EVENT_PROPAGATE;
+void go_back(){
+    webkit_web_view_go_back(WEBKIT_WEB_VIEW(lumi->web_view));
 }
 
-void init(Lumi *lumi){
-    web_view = lumi->web_view;
+Command commands[] = {
+    { "back", go_back },
+    { 0 } };
+
+void init(){
+    lumi_bind(GDK_KEY_BackSpace, "back", 0);
 }

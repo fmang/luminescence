@@ -2,11 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char *name = "Address bar";
+const char *name = "Address Bar";
 
-const char *description = "Press o to input an URL.";
-
-GtkWidget *web_view;
+Lumi *lumi;
 GtkWidget *entry;
 
 void go(){
@@ -16,37 +14,38 @@ void go(){
     if(!strstr(raw_uri, "://"))
         strcat(uri, "http://");
     strcat(uri, raw_uri);
-    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(web_view), uri);
+    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(lumi->web_view), uri);
     free(uri);
+    lumi_leave();
+}
+
+void leave(){
     gtk_widget_hide(entry);
 }
 
-int key_callback(GdkEventKey *e){
-    if(e->keyval == GDK_KEY_Escape){
-        gtk_widget_hide(entry);
-        return FOCUS_RELEASE | EVENT_PROPAGATE;
-    }
-    else if(gtk_widget_get_visible(entry))
-        return FOCUS_GRAB | EVENT_PROPAGATE;
-    else if(e->keyval == GDK_KEY_o){
-        const gchar *uri = webkit_web_view_get_uri(WEBKIT_WEB_VIEW(web_view));
-        gtk_entry_set_text(GTK_ENTRY(entry), uri ? uri : "");
-        gtk_widget_show(entry);
-        gtk_widget_grab_focus(entry);
-        return FOCUS_GRAB | EVENT_STOP;
-    }
-    else if(e->keyval == GDK_KEY_y){
-        gchar *txt = gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY));
-        gtk_entry_set_text(GTK_ENTRY(entry), txt ? txt : "");
-        if(txt) g_free(txt);
-        gtk_widget_show(entry);
-        gtk_widget_grab_focus(entry);
-    }
-    return EVENT_PROPAGATE;
+void edit(){
+    const gchar *uri = webkit_web_view_get_uri(WEBKIT_WEB_VIEW(lumi->web_view));
+    gtk_entry_set_text(GTK_ENTRY(entry), uri ? uri : "");
+    gtk_widget_show(entry);
+    gtk_widget_grab_focus(entry);
+    lumi_focus();
 }
 
-void init(Lumi *lumi){
-    web_view = lumi->web_view;
+void paste(){
+    char *txt = gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY));
+    gtk_entry_set_text(GTK_ENTRY(entry), txt ? txt : "");
+    if(txt) g_free(txt);
+    gtk_widget_show(entry);
+    gtk_widget_grab_focus(entry);
+    lumi_focus();
+}
+
+Command commands[] = {
+    { "uri-edit", edit },
+    { "uri-paste", paste },
+    { "leave", leave } };
+
+void init(){
     entry = gtk_entry_new();
     gtk_entry_set_has_frame(GTK_ENTRY(entry), FALSE);
     g_signal_connect(entry, "activate", G_CALLBACK(go), NULL);

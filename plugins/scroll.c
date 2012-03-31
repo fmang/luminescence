@@ -1,30 +1,27 @@
 #include <luminescence.h>
+#include <string.h>
 
 const char *name = "Scroll";
 
-const char *description = "Scroll using the hjkl keys (left, bottom, top, right, respectively).";
+Lumi *lumi;
 
-GtkWidget *web_view;
+#define ARG_CASE(str) if(strcasecmp(arg, (str)) == 0)
 
-int key_callback(GdkEventKey *e){
-    GtkAdjustment *adjustment = 0;
-    gdouble factor = 1;
-    switch(e->keyval){
-        case GDK_KEY_k: factor = -1;
-        case GDK_KEY_j: adjustment = gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(web_view));
-            break;
-        case GDK_KEY_h: factor = -1;
-        case GDK_KEY_l: adjustment = gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(web_view));
-            break;
-    }
-    if(adjustment){
-        gtk_adjustment_set_value(adjustment,
-            gtk_adjustment_get_value(adjustment) + factor*gtk_adjustment_get_step_increment(adjustment));
-        return EVENT_STOP;
-    }
-    return EVENT_PROPAGATE;
+void scroll(const char *arg){
+    if(!arg) return;
+    GtkAdjustment *adjustment = arg[0] == 'u' || arg[0] == 'd'
+        ? gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(lumi->web_view))
+        : gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(lumi->web_view));
+    gdouble factor = 0;
+    ARG_CASE("up")    factor = -1;
+    ARG_CASE("right") factor = 1;
+    ARG_CASE("down")  factor = 1;
+    ARG_CASE("left")  factor = -1;
+    if(factor == 0) return;
+    gtk_adjustment_set_value(adjustment,
+        gtk_adjustment_get_value(adjustment) + factor*gtk_adjustment_get_step_increment(adjustment));
 }
 
-void init(Lumi *lumi){
-    web_view = lumi->web_view;
-}
+Command commands[] = {
+    { "scroll", scroll },
+    { 0 } };
