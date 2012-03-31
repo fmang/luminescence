@@ -181,14 +181,40 @@ void print_help(){
 /* Keys                                         */
 /************************************************/
 
-typedef struct {
+struct Binding {
     guint key;
-    char *command;
-    char *argument;
-} Binding;
+    const char *command;
+    const char *argument;
+    struct Binding *next;
+};
 
-Binding *bindings = 0;
-int binding_count = 0;
+struct Binding *bindings = 0;
+
+void* add_binding(guint key, const char *cmd, const char *arg){
+    struct Binding *b = malloc(sizeof(struct Binding));
+    b->key = key;
+    b->command = cmd;
+    b->argument = arg;
+    b->next = bindings;
+    bindings = b;
+    return b;
+}
+
+void remove_binding(void *b){
+    struct Binding *i = bindings;
+    if(i == b){
+        bindings = i->next;
+        free(b);
+        return;
+    }
+    for(; i; i = i->next){
+        if(i->next == b){
+            i->next = i->next->next;
+            free(b);
+            return;
+        }
+    }
+}
 
 int focused = 0;
 
@@ -203,10 +229,10 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
         return FALSE;
     }
     if(focused) return FALSE;
-    int i = 0;
-    for(; i<binding_count; i++){
-        if(bindings[i].key == event->keyval)
-            run_command(bindings[i].command, bindings[i].argument);
+    struct Binding *b = bindings;
+    for(; b; b=b->next){
+        if(b->key == event->keyval)
+            run_command(b->command, b->argument);
     }
     return TRUE;
 }
@@ -223,6 +249,8 @@ int main(int argc, char **argv){
 
     lumi.focus = focus;
     lumi.exec = run_command_delayed;
+    lumi.bind = add_binding;
+    lumi.unbind = remove_binding;
     load_plugins();
 
     // Help

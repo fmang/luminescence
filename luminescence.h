@@ -10,6 +10,8 @@ typedef struct {
     GtkWidget *web_view;   // WebKitWebView
     void (*focus)(void);
     void (*exec)(const char*, const char*);
+    void* (*bind)(guint, const char*, const char*);
+    void (*unbind)(void*);
 } Lumi;
 
 typedef struct {
