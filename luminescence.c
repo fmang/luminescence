@@ -224,6 +224,8 @@ void focus(){
     focused = 1;
 }
 
+#define MOD_MASK ~(GDK_SHIFT_MASK)
+
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     if(event->keyval == GDK_KEY_Escape){
         run_command("leave", 0);
@@ -233,7 +235,7 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     if(focused) return FALSE;
     struct Binding *b = bindings;
     for(; b; b=b->next){
-        if(b->key == event->keyval && b->modifiers == event->state)
+        if(b->key == event->keyval && (b->modifiers&MOD_MASK) == (event->state&MOD_MASK))
             run_command(b->command, b->argument);
     }
     return TRUE;
