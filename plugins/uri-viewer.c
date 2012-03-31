@@ -16,16 +16,10 @@ void link_hovered(WebKitWebView *view, gchar *title, gchar *uri){
 
 void yank(){
     gtk_clipboard_set_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY), gtk_label_get_text(GTK_LABEL(uri_label)), -1);
-    gtk_widget_hide(uri_label);
 }
 
-void show(){
-    gtk_widget_show(uri_label);
-}
-
-void hide(){
-    gtk_widget_hide(uri_label);
-}
+void show(){ gtk_widget_show(uri_label); }
+void hide(){ gtk_widget_hide(uri_label); }
 
 Command commands[] = {
     { "uri-show", show },
