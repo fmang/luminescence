@@ -24,6 +24,7 @@ void run_command(const char *cmd, const char *arg){
             commands[i]->exec(arg);
     }
 }
+
 bool ready = 0;
 char **delayed_commands = 0;
 char **delayed_arguments = 0;
@@ -37,7 +38,7 @@ void run_command_delayed(const char *cmd, const char *arg){
     delayed_commands = (char**) realloc(delayed_commands, sizeof(char*) * (delayed_count+1));
     delayed_arguments = (char**) realloc(delayed_arguments, sizeof(char*) * (delayed_count+1));
     delayed_commands[delayed_count] = strdup(cmd);
-    delayed_arguments[delayed_count] = strdup(arg);
+    delayed_arguments[delayed_count] = arg ? strdup(arg) : 0;
     delayed_count++;
 }
 
@@ -47,7 +48,7 @@ void run_delayed_commands(){
     for(; i<delayed_count; i++){
         run_command(delayed_commands[i], delayed_arguments[i]);
         free(delayed_commands[i]);
-        free(delayed_arguments[i]);
+        if(delayed_arguments[i]) free(delayed_arguments[i]);
     }
     free(delayed_commands);
     free(delayed_arguments);
