@@ -183,6 +183,7 @@ void print_help(){
 
 struct Binding {
     guint key;
+    guint modifiers;
     const char *command;
     const char *argument;
     struct Binding *next;
@@ -190,9 +191,10 @@ struct Binding {
 
 struct Binding *bindings = 0;
 
-void* add_binding(guint key, const char *cmd, const char *arg){
+void* add_binding(guint mods, guint key, const char *cmd, const char *arg){
     struct Binding *b = malloc(sizeof(struct Binding));
     b->key = key;
+    b->modifiers = mods;
     b->command = cmd;
     b->argument = arg;
     b->next = bindings;
@@ -231,7 +233,7 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     if(focused) return FALSE;
     struct Binding *b = bindings;
     for(; b; b=b->next){
-        if(b->key == event->keyval)
+        if(b->key == event->keyval && b->modifiers == event->state)
             run_command(b->command, b->argument);
     }
     return TRUE;
