@@ -62,7 +62,7 @@ typedef struct {
     char *filename;
     const char *name;
     const char *description;
-    void (*init)(Lumi*);
+    void (*init)();
     Command *commands;
 } Plugin;
 
@@ -85,6 +85,8 @@ void load_plugin(const char *filename){
     const char **description = dlsym(handle, "description");
     plugin->description = description ? *description : 0;
     plugin->init = dlsym(handle, "init");
+    Lumi **plugin_lumi = dlsym(handle, "lumi");
+    *plugin_lumi = &lumi;
 
     // Commands
     plugin->commands = dlsym(handle, "commands");
@@ -291,7 +293,7 @@ int main(int argc, char **argv){
     // Plugins
     int i;
     for(i=0; i<plugin_count; i++)
-        if(plugins[i].init) (*plugins[i].init)(&lumi);
+        if(plugins[i].init) (*plugins[i].init)();
     run_delayed_commands();
     parse_arguments(argc, argv);
 
