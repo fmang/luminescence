@@ -6,6 +6,53 @@
 
 Lumi lumi;
 
+/************************************************/
+/* Commands                                     */
+/************************************************/
+
+Command **commands = 0;
+int command_count = 0;
+
+void run_command(const char *cmd, const char *arg){
+    int i = 0;
+    for(; i<command_count; i++){
+        if(strcmp(commands[i]->name, cmd) == 0)
+            commands[i]->exec(arg);
+    }
+}
+bool ready = 0;
+char **delayed_commands = 0;
+char **delayed_arguments = 0;
+int delayed_count = 0;
+
+void run_command_delayed(const char *cmd, const char *arg){
+    if(ready){
+        run_command(cmd, arg);
+        return;
+    }
+    delayed_commands = (char**) realloc(delayed_commands, sizeof(char*) * (delayed_count+1));
+    delayed_arguments = (char**) realloc(delayed_arguments, sizeof(char*) * (delayed_count+1));
+    delayed_commands[delayed_count] = strdup(cmd);
+    delayed_arguments[delayed_count] = strdup(arg);
+    delayed_count++;
+}
+
+void run_delayed_commands(){
+    ready = 1;
+    int i = 0;
+    for(; i<delayed_count; i++){
+        run_command(delayed_commands[i], delayed_arguments[i]);
+        free(delayed_commands[i]);
+        free(delayed_arguments[i]);
+    }
+    free(delayed_commands);
+    free(delayed_arguments);
+}
+
+/************************************************/
+/* Plugins                                      */
+/************************************************/
+
 typedef struct {
     void *handle;
     char *filename;
@@ -17,24 +64,6 @@ typedef struct {
 
 Plugin *plugins = 0;
 int plugin_count = 0;
-
-Command **commands = 0;
-int command_count = 0;
-
-typedef struct {
-    guint key;
-    char *command;
-    char *argument;
-} Binding;
-
-Binding *bindings = 0;
-int binding_count = 0;
-
-int focused = 0;
-
-void focus(){
-    focused = 1;
-}
 
 void load_plugin(const char *filename){
     char path[256];
@@ -80,13 +109,9 @@ void load_plugins(){
     free(entries);
 }
 
-void run_command(const char *cmd, const char *arg){
-    int i = 0;
-    for(; i<command_count; i++){
-        if(strcmp(commands[i]->name, cmd) == 0)
-            commands[i]->exec(arg);
-    }
-}
+/************************************************/
+/* Command Line                                 */
+/************************************************/
 
 void parse_arguments(int argc, char **argv){
     int i, eq;
@@ -152,6 +177,25 @@ void print_help(){
     }
 }
 
+/************************************************/
+/* Keys                                         */
+/************************************************/
+
+typedef struct {
+    guint key;
+    char *command;
+    char *argument;
+} Binding;
+
+Binding *bindings = 0;
+int binding_count = 0;
+
+int focused = 0;
+
+void focus(){
+    focused = 1;
+}
+
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     if(event->keyval == GDK_KEY_Escape){
         run_command("leave", 0);
@@ -167,34 +211,9 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     return TRUE;
 }
 
-bool ready = 0;
-char **delayed_commands = 0;
-char **delayed_arguments = 0;
-int delayed_count = 0;
-
-void run_command_delayed(const char *cmd, const char *arg){
-    if(ready){
-        run_command(cmd, arg);
-        return;
-    }
-    delayed_commands = (char**) realloc(delayed_commands, sizeof(char*) * (delayed_count+1));
-    delayed_arguments = (char**) realloc(delayed_arguments, sizeof(char*) * (delayed_count+1));
-    delayed_commands[delayed_count] = strdup(cmd);
-    delayed_arguments[delayed_count] = strdup(arg);
-    delayed_count++;
-}
-
-void run_delayed_commands(){
-    ready = 1;
-    int i = 0;
-    for(; i<delayed_count; i++){
-        run_command(delayed_commands[i], delayed_arguments[i]);
-        free(delayed_commands[i]);
-        free(delayed_arguments[i]);
-    }
-    free(delayed_commands);
-    free(delayed_arguments);
-}
+/************************************************/
+/* Main                                         */
+/************************************************/
 
 int main(int argc, char **argv){
     char *lumi_dir = strdup(getenv("HOME"));
