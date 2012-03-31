@@ -88,47 +88,6 @@ void run_command(const char *cmd, const char *arg){
     }
 }
 
-void load_config(const char *file, int is_keys){
-    FILE *f = fopen(file, "r");
-    if(!f) return;
-    char *line = 0, *cur = 0;
-    size_t n = 0, count;
-    char *command;
-    guint key;
-    while(getline(&line, &n, f) != -1){
-        for(cur = line; *cur == ' '; cur++); // skip spaces
-        if(*cur == '\0') continue; // null
-        if(*cur == '\n' || *cur == '#') continue; // comment or empty
-        while(*cur != '\0' && *cur != '\n') cur++;
-        *cur = '\0'; // drop the line feed
-        for(cur = line; *cur == ' '; cur++); // rewind
-        if(is_keys){
-            if(cur[1] != ' ') continue; // only one-letter keys are allowed
-            key = *cur;
-            cur++;
-            while(*cur == ' ') cur++; // skip spaces
-        }
-        if(*cur == '\0') continue;
-        for(count = 0; cur[count] != '\0' && cur[count] != ' '; count++);
-        command = strndup(cur, count);
-        cur += count;
-        while(*cur == ' ') cur++; // skip spaces
-        if(is_keys){
-            bindings = (Binding*) realloc(bindings, sizeof(Binding) * (binding_count+1));
-            Binding *b = bindings + binding_count++;
-            b->key = key;
-            b->command = command;
-            b->argument = *cur == '\0' ? 0 : strdup(cur);
-        }
-        else{
-            run_command(command, *cur == '\0' ? 0 : cur);
-            free(command);
-        }
-    }
-    free(line);
-    fclose(f);
-}
-
 void parse_arguments(int argc, char **argv){
     int i, eq;
     char *arg = 0;
@@ -285,10 +244,8 @@ int main(int argc, char **argv){
     int i;
     for(i=0; i<plugin_count; i++)
         if(plugins[i].init) (*plugins[i].init)(&lumi);
-    load_config("keys", 1);
-    load_config("config", 0);
-    parse_arguments(argc, argv);
     run_delayed_commands();
+    parse_arguments(argc, argv);
 
     // Exec
     gtk_widget_show(lumi.window);
