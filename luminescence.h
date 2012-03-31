@@ -20,4 +20,7 @@ typedef struct {
     const char *help;
 } Command;
 
+#define lumi_focus() (*lumi->exec)("focus", 0)
+#define lumi_leave() (*lumi->exec)("leave", 0)
+
 #endif // LUMINESCENCE_H
