@@ -6,6 +6,8 @@
 
 Lumi lumi;
 
+int focused = 0;
+
 /************************************************/
 /* Commands                                     */
 /************************************************/
@@ -14,6 +16,8 @@ Command **commands = 0;
 int command_count = 0;
 
 void run_command(const char *cmd, const char *arg){
+    if(strcmp(cmd, "leave") == 0) focused = 0;
+    else if(strcmp(cmd, "focus") == 0) focused = 1;
     int i = 0;
     for(; i<command_count; i++){
         if(strcmp(commands[i]->name, cmd) == 0)
@@ -218,12 +222,6 @@ void remove_binding(void *b){
     }
 }
 
-int focused = 0;
-
-void focus(){
-    focused = 1;
-}
-
 #define MOD_MASK ~(GDK_SHIFT_MASK)
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
@@ -251,7 +249,6 @@ int main(int argc, char **argv){
     strcat(lumi_dir, "/.luminescence");
     chdir(lumi_dir);
 
-    lumi.focus = focus;
     lumi.exec = run_command_delayed;
     lumi.bind = add_binding;
     lumi.unbind = remove_binding;

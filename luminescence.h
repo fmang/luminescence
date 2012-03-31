@@ -8,7 +8,6 @@ typedef struct {
     GtkWidget *window;     // GtkWindow
     GtkWidget *status_bar; // GtkBox
     GtkWidget *web_view;   // WebKitWebView
-    void (*focus)(void);
     void (*exec)(const char*, const char*);
     // bind: modifier, key, command, argument
     void* (*bind)(guint, guint, const char*, const char*);
