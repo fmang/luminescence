@@ -7,7 +7,9 @@ Lumi *lumi;
 void **bindings = 0;
 int binding_count;
 
-void run(const char *line, int is_keys){
+void run(char *line, int is_keys){
+    char *lf = strchr(line, '\n');
+    if(lf) *lf = '\0';
     const char *cur = 0;
     size_t count;
     char *command;
@@ -38,16 +40,19 @@ void run(const char *line, int is_keys){
 
 void interpret(const char *file, bool is_bind){
     FILE *f = fopen(file, "r");
-    char *line = 0, *lf;
-    size_t n = 0;
     if(!f) return;
-    while(getline(&line, &n, f) != -1){
-        lf = strchr(line, '\n');
-        if(lf) *lf = '\0';
+    char *line = 0;
+    size_t n = 0;
+    while(getline(&line, &n, f) != -1)
         run(line, is_bind);
-    }
     free(line);
     fclose(f);
+}
+
+void exec(const char *c){
+    char *line = strdup(c);
+    run(line, 0);
+    free(line);
 }
 
 void read_file(const char *f){ interpret(f, 0); }
@@ -63,6 +68,7 @@ void unbind_keys(){
 }
 
 Command commands[] = {
+    { "exec", exec },
     { "run", read_file },
     { "key-bindings", read_keys },
     { "clear-bindings", unbind_keys },
