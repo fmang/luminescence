@@ -87,7 +87,7 @@ void load_plugin(const char *filename){
     plugin->description = description ? *description : 0;
     plugin->init = dlsym(handle, "init");
     Lumi **plugin_lumi = dlsym(handle, "lumi");
-    *plugin_lumi = &lumi;
+    if(plugin_lumi) *plugin_lumi = &lumi;
 
     // Commands
     plugin->commands = dlsym(handle, "commands");
