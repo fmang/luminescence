@@ -15,43 +15,70 @@ int focused = 0;
 Command **commands = 0;
 int command_count = 0;
 
-void run_command(const char *cmd, const char *arg){
-    if(strcmp(cmd, "leave") == 0) focused = 0;
-    else if(strcmp(cmd, "focus") == 0) focused = 1;
+void run_command(int argc, char **argv){
+    if(argc < 1) return;
+    if(strcmp(argv[0], "leave") == 0) focused = 0;
+    else if(strcmp(argv[0], "focus") == 0) focused = 1;
     int i = 0;
     for(; i<command_count; i++){
-        if(strcmp(commands[i]->name, cmd) == 0)
-            commands[i]->exec(arg);
+        if(strcmp(commands[i]->name, argv[0]) == 0)
+            commands[i]->exec(argc, argv);
     }
 }
 
-bool ready = 0;
-char **delayed_commands = 0;
-char **delayed_arguments = 0;
+int ready = 0;
+int *delayed_argc = 0;
+char ***delayed_argv = 0;
 int delayed_count = 0;
 
-void run_command_delayed(const char *cmd, const char *arg){
+void run_command_delayed(int argc, char **argv){
     if(ready){
-        run_command(cmd, arg);
+        run_command(argc, argv);
         return;
     }
-    delayed_commands = (char**) realloc(delayed_commands, sizeof(char*) * (delayed_count+1));
-    delayed_arguments = (char**) realloc(delayed_arguments, sizeof(char*) * (delayed_count+1));
-    delayed_commands[delayed_count] = strdup(cmd);
-    delayed_arguments[delayed_count] = arg ? strdup(arg) : 0;
+    delayed_argc = (int*) realloc(delayed_argc, sizeof(int) * (delayed_count+1));
+    delayed_argc[delayed_count] = argc;
+    delayed_argv = (char***) realloc(delayed_argv, sizeof(char**) * (delayed_count+1));
+    char **args = delayed_argv[delayed_count] = malloc(sizeof(char*) * argc);
+    int i = 0;
+    for(; i<argc; i++)
+        args[i] = strdup(argv[i]);
     delayed_count++;
+}
+
+void run_free(int argc, char ***argv){
+    run_command(argc, *argv);
+    int i = 0;
+    for(; i<argc; i++)
+        free((*argv)[i]);
+    free(*argv);
+    *argv = 0;
 }
 
 void run_delayed_commands(){
     ready = 1;
     int i = 0;
-    for(; i<delayed_count; i++){
-        run_command(delayed_commands[i], delayed_arguments[i]);
-        free(delayed_commands[i]);
-        if(delayed_arguments[i]) free(delayed_arguments[i]);
+    for(; i<delayed_count; i++)
+        run_free(delayed_argc[i], delayed_argv+i);
+    free(delayed_argc); delayed_argc = 0;
+    free(delayed_argv); delayed_argv = 0;
+    delayed_count = 0;
+}
+
+void run_command_va(const char *cmd, ...){
+    int argc = 1;
+    char **argv = (char**) malloc(sizeof(char*));
+    argv[0] = strdup(cmd);
+    char *arg;
+    va_list vl;
+    va_start(vl, cmd);
+    while((arg = va_arg(vl, char*))){
+        argv = (char**) realloc(argv, sizeof(char*) * (argc+1));
+        argv[argc++] = arg;
     }
-    free(delayed_commands);
-    free(delayed_arguments);
+    va_end(vl);
+    run_command_delayed(argc, argv);
+    free(argv);
 }
 
 /************************************************/
@@ -122,27 +149,31 @@ void load_plugins(){
 
 void parse_arguments(int argc, char **argv){
     int i, eq;
-    char *arg = 0;
+    int _argc = 0;
+    char **_argv = 0;
     for(i=1; i<argc; i++){
         if(argv[i][0] == '\0') continue;
         if(argv[i][0] == '-' && argv[i][1] == '-'){
-            if(arg) run_command(arg, 0);
+            if(_argv) run_free(_argc, &_argv);
             for(eq=0; argv[i][2+eq] != '=' && argv[i][2+eq] != '\0'; eq++);
             if(argv[i][2+eq] == '='){
-                arg = strndup(argv[i]+2, eq);
-                run_command(arg, argv[i]+3+eq);
-                free(arg);
-                arg = 0;
+                _argc = 2;
+                _argv = (char**) malloc(sizeof(char*) * 2);
+                _argv[0] = strndup(argv[i]+2, eq);
+                _argv[1] = strdup(argv[i]+3+eq);
             }
-            else
-                arg = argv[i]+2;
+            else{
+                _argc = 1;
+                _argv = (char**) malloc(sizeof(char*));
+                _argv[0] = strdup(argv[i]+2);
+            }
         }
-        else if(arg){
-            run_command(arg, argv[i]);
-            arg = 0;
+        else if(_argv){
+            _argv = (char**) realloc(_argv, sizeof(char*) * (_argc+1));
+            _argv[_argc++] = strdup(argv[i]);
         }
     }
-    if(arg) run_command(arg, 0);
+    if(_argv) run_free(_argc, &_argv);
 }
 
 void print_help(){
@@ -238,7 +269,7 @@ void remove_binding(void *b){
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     if(event->keyval == GDK_KEY_Escape){
-        run_command("leave", 0);
+        run_command_va("leave", 0);
         focused = 0;
         return FALSE;
     }
@@ -246,7 +277,7 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     struct Binding *b = bindings;
     for(; b; b=b->next){
         if(b->key == event->keyval && (b->modifiers&MOD_MASK) == (event->state&MOD_MASK))
-            run_command(b->command, b->argument);
+            run_command_va(b->command, b->argument, 0);
     }
     return TRUE;
 }
@@ -261,7 +292,7 @@ int main(int argc, char **argv){
     strcat(lumi_dir, "/.luminescence");
     chdir(lumi_dir);
 
-    lumi.exec = run_command_delayed;
+    lumi.exec = run_command_va;
     lumi.bind = add_binding;
     lumi.unbind = remove_binding;
     load_plugins();
