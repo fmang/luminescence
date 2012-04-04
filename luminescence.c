@@ -6,8 +6,6 @@
 
 Lumi lumi;
 
-int focused = 0;
-
 /************************************************/
 /* Commands                                     */
 /************************************************/
@@ -17,8 +15,6 @@ int command_count = 0;
 
 void run_command(int argc, char **argv){
     if(argc < 1) return;
-    if(strcmp(argv[0], "leave") == 0) focused = 0;
-    else if(strcmp(argv[0], "focus") == 0) focused = 1;
     int i = 0;
     for(; i<command_count; i++){
         if(strcmp(commands[i]->name, argv[0]) == 0)
@@ -216,73 +212,6 @@ void print_help(){
 }
 
 /************************************************/
-/* Keys                                         */
-/************************************************/
-
-struct Binding {
-    guint key;
-    guint modifiers;
-    const char *command;
-    const char *argument;
-    struct Binding *next;
-};
-
-struct Binding *bindings = 0;
-struct Binding *last_binding = 0;
-
-void* add_binding(guint mods, guint key, const char *cmd, const char *arg){
-    struct Binding *b = malloc(sizeof(struct Binding));
-    b->key = key;
-    b->modifiers = mods;
-    b->command = cmd;
-    b->argument = arg;
-    b->next = 0;
-    if(!bindings)
-        bindings = last_binding = b;
-    else{
-        if(!last_binding)
-            for(last_binding=bindings; last_binding->next; last_binding=last_binding->next);
-        last_binding->next = b;
-        last_binding = b;
-    }
-    return b;
-}
-
-void remove_binding(void *b){
-    last_binding = 0; // make it obsolete
-    if(b == bindings){
-        bindings = bindings->next;
-        free(b);
-        return;
-    }
-    struct Binding *i = bindings;
-    for(; i->next; i=i->next){
-        if(i->next == b){
-            i->next = i->next->next;
-            free(b);
-            return;
-        }
-    }
-}
-
-#define MOD_MASK ~(GDK_SHIFT_MASK)
-
-bool on_key_press(GtkWidget *widget, GdkEventKey *event){
-    if(event->keyval == GDK_KEY_Escape){
-        run_command_va("leave", 0);
-        focused = 0;
-        return FALSE;
-    }
-    if(focused) return FALSE;
-    struct Binding *b = bindings;
-    for(; b; b=b->next){
-        if(b->key == event->keyval && (b->modifiers&MOD_MASK) == (event->state&MOD_MASK))
-            run_command_va(b->command, b->argument, 0);
-    }
-    return TRUE;
-}
-
-/************************************************/
 /* Main                                         */
 /************************************************/
 
@@ -292,9 +221,8 @@ int main(int argc, char **argv){
     strcat(lumi_dir, "/.luminescence");
     chdir(lumi_dir);
 
-    lumi.exec = run_command_va;
-    lumi.bind = add_binding;
-    lumi.unbind = remove_binding;
+    lumi.execv = run_command_delayed;
+    lumi.execl = run_command_va;
     load_plugins();
 
     // Help
@@ -309,10 +237,8 @@ int main(int argc, char **argv){
 
     // Window
     lumi.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_widget_add_events(lumi.window, GDK_KEY_PRESS_MASK);
     gtk_window_set_has_resize_grip(GTK_WINDOW(lumi.window), FALSE);
     g_signal_connect(lumi.window, "delete-event", G_CALLBACK(gtk_main_quit), NULL);
-    g_signal_connect(lumi.window, "key-press-event", G_CALLBACK(on_key_press), NULL);
 
     // Layout
     GtkWidget *layout = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
