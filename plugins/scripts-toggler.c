@@ -12,10 +12,10 @@ void scripts_set_enabled(gboolean enable){
     gtk_widget_set_visible(scripts_label, enable);
 }
 
-void toggle_scripts(const char *arg){
-    if(!arg) scripts_set_enabled(TRUE);
-    else if(strcasecmp(arg, "on") == 0) scripts_set_enabled(TRUE);
-    else if(strcasecmp(arg, "off") == 0) scripts_set_enabled(FALSE);
+void toggle_scripts(int argc, char **argv){
+    if(argc <= 1) scripts_set_enabled(TRUE);
+    else if(strcasecmp(argv[1], "on") == 0) scripts_set_enabled(TRUE);
+    else if(strcasecmp(argv[1], "off") == 0) scripts_set_enabled(FALSE);
 }
 
 Command commands[] = {

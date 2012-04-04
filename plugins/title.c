@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char *name = "Window Title";
+const char *name = "Window title";
 
 Lumi *lumi;
 

@@ -16,32 +16,32 @@ void go(){
     strcat(uri, raw_uri);
     webkit_web_view_load_uri(WEBKIT_WEB_VIEW(lumi->web_view), uri);
     free(uri);
-    lumi_leave();
+    lumi_exec("leave", 0);
 }
 
 void leave(){
     gtk_widget_hide(entry);
 }
 
-void edit(){
-    const gchar *uri = webkit_web_view_get_uri(WEBKIT_WEB_VIEW(lumi->web_view));
+void edit(const char *uri){
     gtk_entry_set_text(GTK_ENTRY(entry), uri ? uri : "");
     gtk_widget_show(entry);
     gtk_widget_grab_focus(entry);
-    lumi_focus();
+    lumi_exec("focus", 0);
+}
+
+void prompt(int argc, char **argv){
+    edit(argc>1 ? argv[1] : webkit_web_view_get_uri(WEBKIT_WEB_VIEW(lumi->web_view)));
 }
 
 void paste(){
     char *txt = gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY));
-    gtk_entry_set_text(GTK_ENTRY(entry), txt ? txt : "");
+    edit(txt);
     if(txt) g_free(txt);
-    gtk_widget_show(entry);
-    gtk_widget_grab_focus(entry);
-    lumi_focus();
 }
 
 Command commands[] = {
-    { "uri-edit", edit },
+    { "uri-edit", prompt },
     { "uri-paste", paste },
     { "leave", leave } };
 

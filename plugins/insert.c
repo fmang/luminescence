@@ -5,13 +5,13 @@ const char *name = "Insert mode";
 Lumi *lumi;
 GtkWidget *insert_label;
 
-void leave(const char *arg){
+void leave(){
     gtk_widget_hide(insert_label);
 }
 
-void insert_mode(const char *arg){
+void insert_mode(){
     gtk_widget_show(insert_label);
-    lumi_focus();
+    lumi_exec("focus", 0);
 }
 
 Command commands[] = {

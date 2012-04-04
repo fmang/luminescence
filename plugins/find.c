@@ -10,12 +10,12 @@ void do_find(){
     gtk_widget_show(label);
     gtk_widget_show(entry);
     gtk_widget_grab_focus(entry);
-    lumi_focus();
+    lumi_exec("focus", 0);
     webkit_web_view_search_text(WEBKIT_WEB_VIEW(lumi->web_view), gtk_entry_get_text(GTK_ENTRY(entry)), FALSE, TRUE, TRUE);
 }
 
-void find(const char *txt){
-    if(txt) gtk_entry_set_text(GTK_ENTRY(entry), txt);
+void find(int argc, char **argv){
+    if(argc > 1) gtk_entry_set_text(GTK_ENTRY(entry), argv[1]);
     else if(!gtk_widget_get_visible(entry))
         gtk_entry_set_text(GTK_ENTRY(entry), "");
     do_find();

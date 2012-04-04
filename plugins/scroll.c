@@ -5,11 +5,11 @@ const char *name = "Scroll";
 
 Lumi *lumi;
 
-#define ARG_CASE(str) if(strcasecmp(arg, (str)) == 0)
+#define ARG_CASE(str) if(strcasecmp(argv[1], (str)) == 0)
 
-void scroll(const char *arg){
-    if(!arg) return;
-    GtkAdjustment *adjustment = arg[0] == 'u' || arg[0] == 'd'
+void scroll(int argc, char **argv){
+    if(argc <= 1) return;
+    GtkAdjustment *adjustment = argv[1][0] == 'u' || argv[1][0] == 'd'
         ? gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(lumi->web_view))
         : gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(lumi->web_view));
     gdouble factor = 0;

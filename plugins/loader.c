@@ -4,8 +4,9 @@ const char *name = "URI Loader";
 
 Lumi *lumi;
 
-void set_uri(const char *uri){
-    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(lumi->web_view), uri);
+void set_uri(int argc, char **argv){
+    if(argc > 1)
+        webkit_web_view_load_uri(WEBKIT_WEB_VIEW(lumi->web_view), argv[1]);
 }
 
 void new_window(WebKitWebView *view){

@@ -10,26 +10,16 @@ GtkWidget *search_entry;
 
 char *search_url = 0;
 
-void setup(const char *arg){
-    if(!arg) return;
-    // Name
-    int colon = 0;
-    while(arg[colon] != '\0' && arg[colon] != ':') colon++;
-    if(arg[colon] == '\0') return; // bad argument
-    char *engine = strndup(arg, colon);
-    gtk_label_set_text(GTK_LABEL(search_label), engine);
-    free(engine);
-    arg += colon + 1;
-    // Url
-    while(*arg == ' ') arg++;
+void setup(int argc, char **argv){
+    if(argc < 3) return;
+    gtk_label_set_text(GTK_LABEL(search_label), argv[1]);
     if(search_url) free(search_url);
-    search_url = strdup(arg);
-    // UI
+    search_url = strdup(argv[2]);
     gtk_entry_set_text(GTK_ENTRY(search_entry), "");
     gtk_widget_show(search_label);
     gtk_widget_show(search_entry);
     gtk_widget_grab_focus(search_entry);
-    lumi_focus();
+    lumi_exec("focus", 0);
 }
 
 void search(){
@@ -39,7 +29,7 @@ void search(){
     strcat(uri, input);
     webkit_web_view_load_uri(WEBKIT_WEB_VIEW(lumi->web_view), uri);
     free(uri);
-    lumi_leave();
+    lumi_exec("leave", 0);
 }
 
 void hide(){
@@ -48,7 +38,7 @@ void hide(){
 }
 
 Command commands[] = {
-    { "websearch", setup, "e.g. \"Foo, http://foo/search?q=\"" },
+    { "websearch", setup },
     { "leave", hide },
     { 0 } };
 
