@@ -174,7 +174,7 @@ void parse_arguments(int argc, char **argv){
 }
 
 void print_help(){
-    puts("Usage: luminescence --COMMAND[=ARG] ...\n");
+    puts("Usage: luminescence --COMMAND ARG1 ARG2 ...\n");
     if(!plugin_count){
         puts("No plugins.");
         return;

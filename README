@@ -27,26 +27,29 @@ COMMANDS
   To execute commands from the command line:
     luminescence --scripts off --user-agent Luminescence
 
-CONFIGURATION
-
-  This requires the exec.c plugin.
-  Alternatively, you can configure Luminescence directly from C. Have a look at luminescence.h.
+CONFIGURATION (exec.c)
 
   The default configuration file is stored in ~/.luminescence/config:
     # Sample configuration file
-    user-agent Luminescence
+    user-agent "Mozilla/5.0 Luminescence"
     scripts off
     uri http://foo/homepage
 
-  KEY BINDINGS
+  Alternatively, you can configure Luminescence directly from C. Have a look at luminescence.h.
 
-    You'll want to set up key bindings.
-    For example, you can write into ~/.luminescence/keys:
-      # Sample keys file
-      i insert-mode
-      o uri-hide
-      o uri-edit
-      r reload
+KEY BINDINGS (bind.c)
 
-    To load it, append into ~/.luminescence/config:
-      key-bindings keys
+  You'll want to set up key bindings. The command is 'bind'.
+  For example, you can write into ~/.luminescence/config:
+    bind i insert-mode
+    bind u uri-edit
+    bind r reload
+    bind j scripts off
+    bind J scripts on
+    bind / find
+
+ALIASES (alias.c)
+
+  You may want to hide the URI label when editing the URI.
+  All you have to do is run:
+    on uri-edit uri-hide
