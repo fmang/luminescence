@@ -67,6 +67,8 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event){
 
 Command commands[] = {
     { "bind", bind_key },
+    { "focus", focus },
+    { "leave", leave },
     { 0 } };
 
 void init(){
