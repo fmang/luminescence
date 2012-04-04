@@ -15,9 +15,10 @@ int command_count = 0;
 
 void run_command(int argc, char **argv){
     if(argc < 1) return;
+    if(strcmp(argv[0], "*") == 0) return;
     int i = 0;
     for(; i<command_count; i++){
-        if(strcmp(commands[i]->name, argv[0]) == 0)
+        if(strcmp(commands[i]->name, argv[0]) == 0 || strcmp(commands[i]->name, "*") == 0)
             commands[i]->exec(argc, argv);
     }
 }
