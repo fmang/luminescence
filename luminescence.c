@@ -234,6 +234,9 @@ int main(int argc, char **argv){
         }
     }
 
+    g_thread_init(NULL);
+    gdk_threads_init();
+    gdk_threads_enter();
     gtk_init(&argc, &argv);
 
     // Window
@@ -268,6 +271,7 @@ int main(int argc, char **argv){
     // Exec
     gtk_widget_show(lumi.window);
     gtk_main();
+    gdk_threads_leave();
 
     return 0;
 }
