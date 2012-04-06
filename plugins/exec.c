@@ -1,6 +1,7 @@
 #include <luminescence.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 Lumi *lumi;
 
@@ -40,6 +41,8 @@ void exec(const char *c){
     if(argv) free(argv);
 }
 
+// Wrappers
+
 void exec_many(int argc, char **argv){
     int i = 1;
     for(; i<argc; i++)
@@ -63,9 +66,32 @@ void exec_files(int argc, char **argv){
         exec_file(argv[i]);
 }
 
+void* shell_f(void *p){
+    char *line = 0;
+    size_t n = 0;
+    while(getline(&line, &n, stdin) != -1){
+        gdk_threads_enter();
+        exec(line);
+        gdk_threads_leave();
+    }
+    free(line);
+    return 0;
+}
+
+// Commands
+
+void shell(){
+    static int started = 0;
+    if(started) return;
+    started = 1;
+    pthread_t thread;
+    pthread_create(&thread, 0, shell_f, 0);
+}
+
 Command commands[] = {
     { "exec", exec_many },
     { "run", exec_files },
+    { "shell", shell },
     { 0 } };
 
 void init(){
