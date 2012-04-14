@@ -174,12 +174,12 @@ void parse_arguments(int argc, char **argv){
 }
 
 void print_help(){
+    puts("Luminescence version 1.0");
     puts("Usage: luminescence --COMMAND ARG1 ARG2 ...\n");
     if(!plugin_count){
         puts("No plugins.");
         return;
     }
-    puts("Available plugins:");
     int i, j, pad;
     Command *c;
     int longest = 0;
