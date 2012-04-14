@@ -18,8 +18,8 @@ void paste(){
 }
 
 void yank(){
-    gtk_clipboard_set_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY),
-        active_uri ? active_uri : webkit_web_view_get_uri(WEBKIT_WEB_VIEW(lumi->web_view)), -1);
+    const char *uri = active_uri ? active_uri : webkit_web_view_get_uri(WEBKIT_WEB_VIEW(lumi->web_view));
+    if(uri) gtk_clipboard_set_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY), uri, -1);
 }
 
 Command commands[] = {
