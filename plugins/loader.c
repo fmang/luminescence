@@ -14,8 +14,6 @@ void new_window(WebKitWebView *view){
     const char *uri = webkit_web_view_get_uri(view);
     if(fork() == 0)
         execlp("luminescence", "luminescence", "--uri", uri, NULL);
-    else
-        gtk_widget_destroy(GTK_WIDGET(view));
 }
 
 WebKitWebView* create_web_view(){
