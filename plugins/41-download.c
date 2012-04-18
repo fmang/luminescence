@@ -35,7 +35,7 @@ void register_download(WebKitDownload *d){
     gtk_widget_set_tooltip_text(dw->progress_bar, webkit_download_get_destination_uri(d));
     g_signal_connect(dw->download, "notify::progress", G_CALLBACK(update_progress), dw);
     g_signal_connect(dw->download, "notify::status", G_CALLBACK(clean), dw);
-    gtk_box_pack_end(GTK_BOX(lumi->status_bar), dw->progress_bar, FALSE, FALSE, 3);
+    gtk_box_pack_start(GTK_BOX(lumi->status_bar), dw->progress_bar, FALSE, FALSE, 3);
     gtk_widget_show(dw->progress_bar);
 }
 

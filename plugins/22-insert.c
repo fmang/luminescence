@@ -20,6 +20,6 @@ Command commands[] = {
     { 0 } };
 
 void init(){
-    insert_label = gtk_label_new("INSERT");
-    gtk_box_pack_end(GTK_BOX(lumi->status_bar), insert_label, FALSE, FALSE, 3);
+    insert_label = gtk_label_new("Insert mode.");
+    gtk_box_pack_start(GTK_BOX(lumi->status_bar), insert_label, FALSE, FALSE, 3);
 }

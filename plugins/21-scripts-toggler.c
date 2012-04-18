@@ -24,6 +24,6 @@ Command commands[] = {
 
 void init(){
     scripts_label = gtk_label_new("JS");
-    gtk_box_pack_end(GTK_BOX(lumi->status_bar), scripts_label, FALSE, FALSE, 3);
+    gtk_box_pack_start(GTK_BOX(lumi->status_bar), scripts_label, FALSE, FALSE, 3);
     scripts_set_enabled(FALSE);
 }
