@@ -16,10 +16,11 @@ void toggle_scripts(int argc, char **argv){
     if(argc <= 1) scripts_set_enabled(TRUE);
     else if(strcasecmp(argv[1], "on") == 0) scripts_set_enabled(TRUE);
     else if(strcasecmp(argv[1], "off") == 0) scripts_set_enabled(FALSE);
+    else if(strcasecmp(argv[1], "toggle") == 0) scripts_set_enabled(!gtk_widget_get_visible(scripts_label));
 }
 
 Command commands[] = {
-    { "scripts", toggle_scripts, "on / OFF" },
+    { "scripts", toggle_scripts, "on / off / toggle" },
     { 0 } };
 
 void init(){
