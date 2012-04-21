@@ -1,6 +1,7 @@
 #include <luminescence.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 const char *name = "Download";
 
@@ -31,7 +32,6 @@ void register_download(WebKitDownload *d){
     Download *dw = (Download*) malloc(sizeof(Download));
     dw->download = d;
     dw->progress_bar = gtk_progress_bar_new();
-    gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(dw->progress_bar), TRUE);
     gtk_widget_set_tooltip_text(dw->progress_bar, webkit_download_get_destination_uri(d));
     g_signal_connect(dw->download, "notify::progress", G_CALLBACK(update_progress), dw);
     g_signal_connect(dw->download, "notify::status", G_CALLBACK(clean), dw);
@@ -39,11 +39,24 @@ void register_download(WebKitDownload *d){
     gtk_widget_show(dw->progress_bar);
 }
 
+char* unused_filename(const char *f){
+    char *fn = (char*) malloc(strlen(f) + 4);
+    strcpy(fn, f);
+    char *n = fn + strlen(f);
+    int i = 0;
+    for(; i<100 && access(fn+7, F_OK)==0; i++){
+        *n = '.';
+        sprintf(n+1, "%d", i);
+    }
+    return fn;
+}
+
 void download_c(int argc, char **argv){
     if(argc != 3) return;
     WebKitNetworkRequest *request = webkit_network_request_new(argv[1]);
     WebKitDownload *dw = webkit_download_new(request);
-    webkit_download_set_destination_uri(dw, argv[2]);
+    char *dst = unused_filename(argv[2]);
+    webkit_download_set_destination_uri(dw, dst);
     register_download(dw);
     webkit_download_start(dw);
 }
@@ -52,13 +65,16 @@ Command commands[] = {
     { "download", download_c },
     { 0 } };
 
-#define DESTDIR "FILE:///tmp/"
+#define DESTDIR "file:///tmp/dw/"
 
 gboolean download_requested(WebKitWebView *view, WebKitDownload *dw){
+    mkdir(DESTDIR+7, 0777); // 7 = strlen("file://")
     const gchar *name = webkit_download_get_suggested_filename(dw);
-    char *dst = (char*) malloc(strlen(name) + strlen(DESTDIR) + 1);
-    strcpy(dst, DESTDIR);
-    strcat(dst, name);
+    char *fn = (char*) malloc(strlen(name) + strlen(DESTDIR) + 1);
+    strcpy(fn, DESTDIR);
+    strcat(fn, name);
+    char *dst = unused_filename(fn);
+    free(fn);
     webkit_download_set_destination_uri(dw, dst);
     register_download(dw);
     return TRUE;
