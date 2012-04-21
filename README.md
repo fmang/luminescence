@@ -72,3 +72,6 @@ You may want to hide the URI label when editing the URI.
 All you have to do is run:
 
     on uri-edit uri-hide
+
+The `alias` command is similar to `on` except that is relays the arguments.
+You can use it to create synonyms or shortcuts.
