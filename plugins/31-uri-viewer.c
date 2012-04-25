@@ -27,7 +27,6 @@ void init(){
     gtk_label_set_selectable(GTK_LABEL(uri_label), TRUE);
     gtk_label_set_ellipsize(GTK_LABEL(uri_label), PANGO_ELLIPSIZE_MIDDLE);
     gtk_misc_set_alignment(GTK_MISC(uri_label), 1, 0.5);
-    gtk_misc_set_padding(GTK_MISC(uri_label), 2, 2);
     g_signal_connect(lumi->web_view, "notify::load-status", G_CALLBACK(update_uri), NULL);
     g_signal_connect(lumi->web_view, "hovering-over-link", G_CALLBACK(link_hovered), NULL);
     gtk_box_pack_start(GTK_BOX(lumi->status_bar), uri_label, TRUE, TRUE, 0);
