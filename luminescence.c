@@ -273,5 +273,5 @@ int main(int argc, char **argv){
     gtk_main();
     gdk_threads_leave();
 
-    return 0;
+    return EXIT_SUCCESS;
 }

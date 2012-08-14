@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 void quit(){
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 Command commands[] = {
