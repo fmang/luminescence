@@ -3,7 +3,7 @@ CFLAGS=-g -Wall
 
 all: luminescence
 
-luminescence:
+luminescence: luminescence.c luminescence.h
 	gcc -o luminescence luminescence.c $(CFLAGS) -ldl `pkg-config --cflags --libs gtk+-3.0 webkitgtk-3.0 gthread-2.0`
 
 clean:
