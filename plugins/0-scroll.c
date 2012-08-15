@@ -23,5 +23,5 @@ void scroll(int argc, char **argv){
 }
 
 Command commands[] = {
-    { "scroll", scroll },
+    { "scroll", scroll, "up / right / down / left" },
     { 0 } };
