@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 mkdir -p ~/.luminescence/plugins
 for f in "$@" ; do
     echo "installing $(basename "$f" .c)..."
