@@ -33,7 +33,8 @@ void edit(int argc, char **argv){
 
 Command commands[] = {
     { "uri-edit", edit },
-    { "leave", leave } };
+    { "leave", leave },
+    { 0 } };
 
 void init(){
     entry = gtk_entry_new();
