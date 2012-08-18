@@ -242,6 +242,7 @@ int main(int argc, char **argv){
     // Window
     lumi.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_has_resize_grip(GTK_WINDOW(lumi.window), FALSE);
+    gtk_window_set_default_size(GTK_WINDOW(lumi.window), 640, 480);
     g_signal_connect(lumi.window, "delete-event", G_CALLBACK(gtk_main_quit), NULL);
 
     // Layout
