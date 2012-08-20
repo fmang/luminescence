@@ -1,6 +1,6 @@
 DESTDIR=/usr/local
 CFLAGS=-g -Wall
-LIBDL=$(shell [ -e /lib/libdl.so ] && echo '-ldl' )
+LIBDL=$(shell [ -e /lib/libdl.so.2 ] && echo '-ldl' )
 
 all: luminescence
 
