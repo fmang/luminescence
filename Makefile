@@ -15,3 +15,8 @@ install: luminescence
 	install -m 755 luminescence luminescence-install $(DESTDIR)/bin
 	install -m 644 luminescence.h $(DESTDIR)/include
 	install -m 644 plugins/*.c $(DESTDIR)/src/luminescence/plugins
+
+uninstall:
+	rm -rf $(DESTDIR)/src/luminescence
+	rm -f $(DESTDIR)/bin/luminescence{,-install}
+	rm -f $(DESTDIR)/include/luminescence.h
