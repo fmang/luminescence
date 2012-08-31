@@ -7,7 +7,7 @@ const char *name = "Key bindings";
 Lumi *lumi;
 
 int focused = 0;
-void focus(int argc, char **argv){ focused = 1; } 
+void focus(int argc, char **argv){ focused = 1; }
 void leave(int argc, char **argv){ focused = 0; }
 
 struct Binding {
@@ -49,7 +49,7 @@ void bind_key(int argc, char **argv){
         add_binding(0, argv[1][0], argc-2, argv+2);
 }
 
-#define MOD_MASK ~(GDK_SHIFT_MASK)
+#define MOD_MASK ~(GDK_SHIFT_MASK|GDK_MOD2_MASK)
 
 bool on_key_press(GtkWidget *widget, GdkEventKey *event){
     if(event->keyval == GDK_KEY_Escape){
