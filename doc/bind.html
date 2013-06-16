@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Frédéric Mangano" />
+  <meta name="date" content="2012-04-23" />
+  <title>Key bindings for Luminescence</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="header">
+<h1 class="title">Key bindings for <a href="index.html">Luminescence</a></h1>
+<h2 class="author">Frédéric Mangano</h2>
+<h3 class="date">April 23, 2012</h3>
+</div>
+<h2 id="introduction">Introduction</h2>
+<p>The <code>bind</code> plugin provides a vim-like interface for Luminescence (1.0.1 at the time of this writing). The source file for this plugin can be found <a href="http://git.mg0.fr/luminescence/tree/plugins/0-bind.c?id=2b40fbc2c8e3238b308dfad05733bee5b9af10f4">here</a>.</p>
+<h2 id="quickstart">Quickstart</h2>
+<p>To register key bindings, you should use the <code>bind</code> command. You can either call it directly from the command-line, or write your bindings in the configuration file (see the <a href="README.html">README</a> or the <a href="exec.html"><code>exec</code></a> plugin).</p>
+<pre><code>bind i insert-mode
+bind ^v uri-paste # ^ means Ctrl</code></pre>
+<p>The <a href="exec.html"><code>exec</code></a>-style usage is:</p>
+<pre><code>bind KEY COMMAND ARG1 ARG2 ...</code></pre>
+<h2 id="syntax">Syntax</h2>
+<p>Technically, the <code>bind</code> command takes at least 2 arguments.</p>
+<ul>
+<li>The first is the key that should be bound.</li>
+<li>The second is the name of the command to call when the key is pressed.</li>
+<li>The other arguments are the arguments that will be passed to the command.</li>
+</ul>
+<h3 id="keys">Keys</h3>
+<p>The key is usually a single letter, and the case <em>is</em> important.</p>
+<p>There is also the <code>^</code> modifer to match the Ctrl modifier.</p>
+<p>Currently, other special keys (like Escape or Backspace) are not meant to be bound. However you can probably bind them the right non-printable characters. Otherwise you might as well add a few lines of code to bind the key you want.</p>
+<h2 id="focus">Focus</h2>
+<p><em>Note: this section is for developers.</em></p>
+<p>When the <code>focus</code> command is called, <code>bind</code> relays key events to Gtk instead of handling them like it usually does. The user can release the focus by pressing the Escape key. When releasing the focus, <code>bind</code> calls the <code>leave</code> command, so that all the plugins which have registered the <code>leave</code> command will be aware of the focus release (which usually means &quot;cancel&quot;).</p>
+<p>In other words: you lose all control over the keyboard when focusing.</p>
+</body>
+</html>

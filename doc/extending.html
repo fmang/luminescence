@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Frédéric Mangano" />
+  <meta name="date" content="2012-04-23" />
+  <title>Writing plugins for Luminescence</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="header">
+<h1 class="title">Writing plugins for <a href="index.html">Luminescence</a></h1>
+<h2 class="author">Frédéric Mangano</h2>
+<h3 class="date">April 23, 2012</h3>
+</div>
+<p>Note: this guide is written for Luminescence 1.0.1.</p>
+<h2 id="naming-conventions">Naming conventions</h2>
+<p>Since the plugins are loaded one after another, and some of them add widgets in the status bar, the order they're loaded defines the order of the widgets in the status bar.</p>
+<p>A simple solution is to prefix each plugin with a number; and to keep some harmony, here are the conventions I used:</p>
+<ul>
+<li><p>When a plugin doesn't have GUI components, it can be loaded anytime. To identify them, they're prefixed by <code>0-</code>.</p></li>
+<li><p>Some plugins, like the address bar, can display a field to ask something to the user. Since they fit best in the leftmost part of the status bar, they're prefixed by <code>1-</code>. As two plugins shouldn't display their field at the same time, the order in which these plugins are loaded is irrelevant.</p></li>
+<li><p>The <code>2*-</code> family consist in plugins that display the active mode or some &quot;flags&quot; (e.g. whether scripts are enabled or not). They're usually at the left of the status bar, unless a <code>1-</code> plugin takes the control. This time, the order <code>2*-</code> plugins are loaded <em>is</em> relevant, so the second digit is here to order them.</p></li>
+<li><p>The <code>3*-</code> plugins are supposed to be right-aligned. Currently only the uri-viewer plugin belongs to this category. That could easily have been a simple placeholder.</p></li>
+<li><p>Finally, the <code>4*-</code> plugins are similar to the <code>2*-</code> plugins, except that they're displayed in the right part of the status bar.</p></li>
+</ul>
+<p>Don't take these too seriously though. These will help if you want to integrate your plugins with the default ones. Otherwise you're free to use whatever names you want.</p>
+<h2 id="user-agent-plugin">User Agent plugin</h2>
+<p>See <a href="0-user-agent.c.html">0-user-agent.c</a> (<a href="0-user-agent.c">plain</a>).</p>
+<h3 id="header-file">Header file</h3>
+<pre><code>#include &lt;luminescence.h&gt;</code></pre>
+<p>This is the only header for Luminescence. It includes Gtk and WebKit too, so this single #include is often sufficient.</p>
+<h3 id="meta">Meta</h3>
+<p><em>Important: in the following sections, the names aren't given as examples; the variables must be called this way otherwise Luminescence won't be able to find them.</em></p>
+<pre><code>const char *name = &quot;User Agent&quot;;</code></pre>
+<p>This is the name displayed in the help (<code>luminescence -h</code>). It's completely optional.</p>
+<p>You can also add a <code>description</code> the same way. (But please don't when it's obvious.)</p>
+<h3 id="lumi-pointer">Lumi pointer</h3>
+<pre><code>Lumi *lumi;</code></pre>
+<p>This pointer is set by Luminescence <em>before</em> any function is called (no need to check it). Sometimes it's not even useful, so don't declare it systematically.</p>
+<h3 id="commands">Commands</h3>
+<pre><code>void set_user_agent(int argc, char **argv){ ...</code></pre>
+<p>This is the form of command callbacks. The ressemblance with <code>main</code>'s prototype is intended. Note that, like <code>main</code>'s <code>argv</code>, <code>argv[0]</code> is the name of the called command.</p>
+<p>Also, though I omitted the <code>const</code> keyword, it is <em>not</em> recommended to modify the arguments (but maybe a creative mind can do that to &quot;filter&quot; the arguments). They mustn't be freed either.</p>
+<pre><code>Command commands[] = {
+    { &quot;user-agent&quot;, set_user_agent },
+    { 0 } };</code></pre>
+<p>Once your callbacks are defined, you can &quot;register&quot; the commands by adding them in the <code>commands</code> array. The <code>Command</code> struct currently has 3 fields: the name of the command, the callback, and an optional <code>help</code> string that will be displayed in the help.</p>
+<p>The <code>{ 0 }</code> terminator marks the end of the array. Make <em>sure</em> you don't forget it!</p>
+<h2 id="insert-mode-plugin">Insert Mode plugin</h2>
+<p>See <a href="22-insert.c.html">22-insert.c</a> (<a href="22-insert.c">plain</a>).</p>
+<h3 id="see-above">See above</h3>
+<p>If you're wondering why the callbacks are <code>void</code>, it's because <code>gcc</code> doesn't generate warnings when casting the pointer. Maybe I should look into that someday.</p>
+<h3 id="initialization">Initialization</h3>
+<pre><code>void init()</code></pre>
+<p>This function is called at the startup of Luminescence. You'll usually use it to create the widgets and add them to the status bar (since the <code>lumi</code> pointer is already initialized).</p>
+<h3 id="the-focus-and-leave-commands">The <code>focus</code> and <code>leave</code> commands</h3>
+<p>These two commands are specific to the <code>bind</code> plugin. See <a href="bind.html#focus">its documentation</a> for details.</p>
+<h3 id="command-execution">Command execution</h3>
+<pre><code>void lumi_exec(char*, ...);
+void lumi_execv(int argc, char **argv);</code></pre>
+<p>These should be too hard to understand: <code>lumi_execv</code> takes a list of arguments and run the <code>argv[0]</code> command. Luminescence will relay these two parameters to the plugins that have implemented it.</p>
+<p><code>lumi_exec</code> is provided for convenience. The last &quot;sentinel&quot; argument must be null.</p>
+<pre><code>lumi_exec(&quot;focus&quot;, 0);</code></pre>
+<h2 id="technical-details">Technical details</h2>
+<h3 id="delayed-command-executions">Delayed command executions</h3>
+<p>I can hear you ask:</p>
+<blockquote>
+<p>Okay, but what if I call a command from <code>init()</code>, before the other plugins are initialized?</p>
+</blockquote>
+<p>Easy: Luminescence stores the parameters and actually calls the command once every plugin is initialized.</p>
+<h3 id="the-wildcard-command">The wildcard command</h3>
+<p>The <code>*</code> command is quite special. When a plugin registers that command, the corresponding callback will always be called. (This is where <code>argv[0]</code> is useful.)</p>
+<p>The <code>alias</code> plugin uses it as you cannot register commands dynamically. That could also be used to make a <code>history</code> plugin. (I don't plan on implementing one though.)</p>
+<h2 id="more-information">More information</h2>
+<p>I invite you to read the source files of the plugins (you can also read Luminescence's, it's not even 300 lines long).</p>
+<p>There are also <a href="index.html#documentation">other documents</a>.</p>
+<p>If you still have questions, feel free to email me at <script type="text/javascript">
+<!--
+h='&#x6d;&#x67;&#48;&#46;&#102;&#114;';a='&#64;';n='&#102;&#x6d;&#x61;&#110;&#x67;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#102;&#x6d;&#x61;&#110;&#x67;&#32;&#x61;&#116;&#32;&#x6d;&#x67;&#48;&#32;&#100;&#x6f;&#116;&#32;&#102;&#114;</noscript>.</p>
+</body>
+</html>

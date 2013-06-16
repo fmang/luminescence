@@ -1,0 +1,32 @@
+page-cache
+user-agent "Mozilla/5.0 Luminescence (Arch Linux)"
+
+# Commands
+bind i insert-mode
+bind u uri-edit
+bind Y uri-paste
+bind y uri-yank
+bind / find
+bind r reload
+bind R Reload
+bind j scripts off
+bind J scripts on
+bind Q quit
+bind b back
+bind f forward
+
+# Search
+bind g websearch Google http://google.com/search?hl=en&q=
+bind G websearch Lucky http://google.com/search?hl=en&btnI=&q=
+bind w websearch Wikipedia http://en.wikipedia.org/wiki/
+bind W websearch Wiktionary http://en.wiktionary.org/wiki/
+
+# "Bookmark"
+bind H uri file:///usr/share/doc/ghc/html/libraries/index.html
+
+# Glue the plugins together
+uri-show
+on leave uri-show
+on websearch uri-hide
+on uri-edit uri-hide
+on find uri-hide

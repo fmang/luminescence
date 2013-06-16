@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Frédéric Mangano" />
+  <meta name="date" content="2012-04-23" />
+  <title>Luminescence's shell</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="header">
+<h1 class="title"><a href="index.html">Luminescence</a>'s shell</h1>
+<h2 class="author">Frédéric Mangano</h2>
+<h3 class="date">April 23, 2012</h3>
+</div>
+<h2 id="introduction">Introduction</h2>
+<p>This document describes the <code>exec</code> plugin included in Luminescence 1.0.1 (which haven't changed since 1.0). You can find that version of the file in the <a href="http://git.mg0.fr/luminescence/tree/plugins/0-exec.c?id=2b40fbc2c8e3238b308dfad05733bee5b9af10f4).">Git</a>.</p>
+<p>By default, Luminescence doesn't have any interpreter, only a <code>lumi_exec</code> function (actually it's a macro) callable from C.</p>
+<h2 id="playing-around">Playing around</h2>
+<p>You'd better install the plugin first. Once you've found the source file, run:</p>
+<pre><code>luminescence-install 0-exec.c</code></pre>
+<p>You'd better install the <code>echo</code> plugin too if you want to try the examples.</p>
+<p>Now that the plugins are install, run:</p>
+<pre><code>luminescence --shell</code></pre>
+<p>Don't wait for a prompt (it doesn't display any) and type:</p>
+<pre><code>echo &quot;Hello world!&quot;</code></pre>
+<h2 id="syntax">Syntax</h2>
+<p>It's like (really) barebone bash:</p>
+<pre><code># This is a comment
+echo arg1 arg2 # This is a comment too
+
+echo &quot;arg1, still arg1&quot; arg2
+echo &quot;\&quot;Yo dawg, I heard you like quotes\&quot;&quot; \# this is NOT a comment</code></pre>
+<p>Also, the redundant spaces between arguments are ignored (like in bash).</p>
+<p>And that's it!</p>
+<h2 id="commands">Commands</h2>
+<h3 id="the-shell-command">The <code>shell</code> command</h3>
+<p>Run it and it will read <code>stdin</code>.</p>
+<p>Nothing special, really.</p>
+<h3 id="the-exec-command">The <code>exec</code> command</h3>
+<p>This command interprets inline scripts. Have some examples:</p>
+<pre><code>luminescence --exec &quot;echo hello&quot; &quot;echo world&quot;
+luminescence --exec &quot;$(cat script-file)&quot;</code></pre>
+<h3 id="the-run-command">The <code>run</code> command</h3>
+<p>The better way to execute a script file is to use the <code>run</code> command.</p>
+<pre><code>luminesce --run ~/script</code></pre>
+<p>The paths are relative to Luminescence's directory (usually <code>~/.luminescence</code>). That also means the working directory is ignored. In case of doubts, you'd better use absolute paths.</p>
+<p>By default, the <code>exec</code> plugin interprets the <code>config</code> file on startup.</p>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/luminescence/plugins/0-user-agent.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; }
+.Type { color: #87ffaf; }
+.Constant { color: #ff40ff; }
+.PreProc { color: #5fd7ff; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span><span class="PreProc">#include </span><span class="Constant">&lt;luminescence.h&gt;</span>
+<span class="lnr"> 2 </span>
+<span class="lnr"> 3 </span><span class="Type">const</span> <span class="Type">char</span> *name = <span class="Constant">&quot;User Agent&quot;</span>;
+<span class="lnr"> 4 </span>
+<span class="lnr"> 5 </span>Lumi *lumi;
+<span class="lnr"> 6 </span>
+<span class="lnr"> 7 </span><span class="Type">void</span> set_user_agent(<span class="Type">int</span> argc, <span class="Type">char</span> **argv){
+<span class="lnr"> 8 </span>    g_object_set(webkit_web_view_get_settings(WEBKIT_WEB_VIEW(lumi-&gt;web_view)),
+<span class="lnr"> 9 </span>        <span class="Constant">&quot;user-agent&quot;</span>, (argc&gt;<span class="Constant">1</span> ? argv[<span class="Constant">1</span>] : <span class="Constant">0</span>), <span class="Constant">NULL</span>);
+<span class="lnr">10 </span>}
+<span class="lnr">11 </span>
+<span class="lnr">12 </span>Command commands[] = {
+<span class="lnr">13 </span>    { <span class="Constant">&quot;user-agent&quot;</span>, set_user_agent },
+<span class="lnr">14 </span>    { <span class="Constant">0</span> } };
+</pre>
+</body>
+</html>

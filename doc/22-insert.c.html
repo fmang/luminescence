@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/luminescence/plugins/22-insert.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; }
+.Type { color: #87ffaf; }
+.Constant { color: #ff40ff; }
+.PreProc { color: #5fd7ff; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span><span class="PreProc">#include </span><span class="Constant">&lt;luminescence.h&gt;</span>
+<span class="lnr"> 2 </span>
+<span class="lnr"> 3 </span><span class="Type">const</span> <span class="Type">char</span> *name = <span class="Constant">&quot;Insert mode&quot;</span>;
+<span class="lnr"> 4 </span>
+<span class="lnr"> 5 </span>Lumi *lumi;
+<span class="lnr"> 6 </span>GtkWidget *insert_label;
+<span class="lnr"> 7 </span>
+<span class="lnr"> 8 </span><span class="Type">void</span> leave(){
+<span class="lnr"> 9 </span>    gtk_widget_hide(insert_label);
+<span class="lnr">10 </span>}
+<span class="lnr">11 </span>
+<span class="lnr">12 </span><span class="Type">void</span> insert_mode(){
+<span class="lnr">13 </span>    gtk_widget_show(insert_label);
+<span class="lnr">14 </span>    lumi_exec(<span class="Constant">&quot;focus&quot;</span>, <span class="Constant">0</span>);
+<span class="lnr">15 </span>}
+<span class="lnr">16 </span>
+<span class="lnr">17 </span>Command commands[] = {
+<span class="lnr">18 </span>    { <span class="Constant">&quot;insert-mode&quot;</span>, insert_mode },
+<span class="lnr">19 </span>    { <span class="Constant">&quot;leave&quot;</span>, leave },
+<span class="lnr">20 </span>    { <span class="Constant">0</span> } };
+<span class="lnr">21 </span>
+<span class="lnr">22 </span><span class="Type">void</span> init(){
+<span class="lnr">23 </span>    insert_label = gtk_label_new(<span class="Constant">&quot;Insert mode.&quot;</span>);
+<span class="lnr">24 </span>    gtk_box_pack_start(GTK_BOX(lumi-&gt;status_bar), insert_label, FALSE, FALSE, <span class="Constant">3</span>);
+<span class="lnr">25 </span>}
+</pre>
+</body>
+</html>

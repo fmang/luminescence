@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Frédéric Mangano" />
+  <meta name="date" content="2012-04-21" />
+  <title>Luminescence's README</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="header">
+<h1 class="title"><a href="index.html">Luminescence</a>'s README</h1>
+<h2 class="author">Frédéric Mangano</h2>
+<h3 class="date">April 21, 2012</h3>
+</div>
+<h2 id="installing">Installing</h2>
+<p>For Arch Linux users, an <a href="https://aur.archlinux.org/packages.php?ID=57930">AUR</a> package is available. I also have my <a href="http://mg0.fr/arch">custom repository</a>.</p>
+<p>To install from source:</p>
+<pre><code>make
+make install</code></pre>
+<p>(the default <code>DESTDIR</code> is <code>/usr/local</code>, as usual)</p>
+<h2 id="plugins">Plugins</h2>
+<p>Plugins are read in alphabetical order (it does matter) from <code>~/.luminescence/plugins</code>.</p>
+<p>By default, no plugins are compiled. Instead, their source files are stored in <code>/usr/src/luminescence/plugins</code>.</p>
+<p>The <code>luminescence-install</code> script takes C plugin files and installs them. For example, to install all the available plugins:</p>
+<pre><code>luminescence-install /usr/src/luminescence/plugins/*.c</code></pre>
+<h2 id="commands">Commands</h2>
+<p>You can list the available commands with:</p>
+<pre><code>luminescence --help</code></pre>
+<p>To execute commands from the command line:</p>
+<pre><code>luminescence --scripts off --user-agent Luminescence</code></pre>
+<h2 id="configuration-exec.c">Configuration (exec.c)</h2>
+<p>The default configuration file is stored in <code>~/.luminescence/config</code>:</p>
+<pre><code># Sample configuration file
+user-agent &quot;Mozilla/5.0 Luminescence&quot;
+scripts off
+uri http://foo/homepage</code></pre>
+<p>Alternatively, you can configure Luminescence directly from C. Have a look at <code>luminescence.h</code>.</p>
+<h2 id="key-bindings-bind.c">Key bindings (bind.c)</h2>
+<p>You'll want to set up key bindings. The command is <code>bind</code>. For example, you can write into <code>~/.luminescence/config</code>:</p>
+<pre><code>bind i insert-mode
+bind u uri-edit
+bind r reload
+bind j scripts off
+bind J scripts on
+bind / find</code></pre>
+<h2 id="aliases-alias.c">Aliases (alias.c)</h2>
+<p>You may want to hide the URI label when editing the URI. All you have to do is run:</p>
+<pre><code>on uri-edit uri-hide</code></pre>
+<p>The <code>alias</code> command is similar to <code>on</code> except that is relays the arguments. You can use it to create synonyms or shortcuts.</p>
+</body>
+</html>
